@@ -633,6 +633,26 @@ ESP_8_BIT_composite::ESP_8_BIT_composite(int ntsc)
   {
     _instance_ = this;
   }
+  _selfAllocatedBuffer = NULL;
+  _started = false;
+}
+
+/*
+ * @brief Destructor for ESP_8_BIT composite video wrapper class. This
+ * is only useful for freeing self-allocated memory, because I don't know how
+ * to properly tear down rossumur's ESP_8_BIT magic I wrapped.
+ */
+ESP_8_BIT_composite::~ESP_8_BIT_composite()
+{
+  if(_selfAllocatedBuffer)
+  {
+    delete _selfAllocatedBuffer;
+    _selfAllocatedBuffer = NULL;
+
+    delete _lines;
+    _lines= NULL;
+  }
+  _instance_ = NULL;
 }
 
 /*
@@ -654,15 +674,22 @@ void ESP_8_BIT_composite::setup()
 {
   instance_check();
 
+  if (_started)
+  {
+    ESP_LOGE(TAG, "setup is only allowed to be called once.");
+    ESP_ERROR_CHECK(ESP_FAIL);
+  }
+  _started = true;
+
   // Allocate frame buffer from dynamic memory
   // TODO: Give an option for static memory.
-  uint8_t* pFrameBuffer = new uint8_t[256*240];
-  if( NULL == pFrameBuffer )
+  uint8_t* _selfAllocatedBuffer = new uint8_t[256*240];
+  if( NULL == _selfAllocatedBuffer )
   {
     ESP_LOGE(TAG, "Frame buffer allocation fail");
     ESP_ERROR_CHECK(ESP_FAIL);
   }
-  memset(pFrameBuffer, 0, 256*240);
+  memset(_selfAllocatedBuffer, 0, 256*240);
 
   // Allocate array of lines
   _lines = new uint8_t*[240];
@@ -673,12 +700,35 @@ void ESP_8_BIT_composite::setup()
   }
 
   // Fill line array with pointers to lines in frame buffer
-  uint8_t* linePointer = pFrameBuffer;
+  uint8_t* linePointer = _selfAllocatedBuffer;
   for (int y = 0; y < 240; y++)
   {
     _lines[y] = linePointer;
     linePointer += 256;
   }
+
+  // Start video signal generator
+  video_init(4, !_pal_);
+}
+
+/*
+ * @brief Video subsystem setup: use caller-allocated frame buffer and start engine.
+ *        Caller is responsible for freeing memory.
+ * @param allocated_lines caller-allocated uint8_t*[240], each pointing to uint8_t[256]
+ */
+void ESP_8_BIT_composite::setup_prealloc(uint8_t** allocated_lines)
+{
+  instance_check();
+
+  if (_started)
+  {
+    ESP_LOGE(TAG, "setup is only allowed to be called once.");
+    ESP_ERROR_CHECK(ESP_FAIL);
+  }
+  _started = true;
+
+  _lines = allocated_lines;
+  _selfAllocatedBuffer = NULL;
 
   // Start video signal generator
   video_init(4, !_pal_);
@@ -695,7 +745,7 @@ void ESP_8_BIT_composite::vsync()
 }
 
 /*
- * @brief Retrieve buffer to frame buffer allocated during setup()
+ * @brief Retrieve pointer to frame buffer lines array
  */
 uint8_t** ESP_8_BIT_composite::get_lines()
 {

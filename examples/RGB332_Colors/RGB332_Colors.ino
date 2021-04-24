@@ -1,11 +1,15 @@
 /*
 
-Palette
+Example for ESP_8_BIT color composite video generator library on ESP32.
+Connect GPIO25 to signal line, usually the center of composite video plug.
 
-ESP_8_BIT color composite video generator library example
+RGB332_Colors
 
 Draws 256 blocks on screen, each one filled with a RGB332 color. This
 represents the full palette of available colors while using this library.
+
+Also demonstrates drawing by directly manipulating bytes in frame buffer,
+without using any drawing library functions.
 
 Copyright (c) Roger Cheng
 

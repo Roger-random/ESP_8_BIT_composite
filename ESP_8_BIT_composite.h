@@ -61,12 +61,47 @@ SOFTWARE.
 class ESP_8_BIT_composite
 {
   public:
+    /*
+     * @brief Constructor for ESP_8_BIT composite video wrapper class
+     * @param ntsc True (or nonzero) for NTSC mode, False (or zero) for PAL mode
+     */
     ESP_8_BIT_composite(int ntsc);
+
+    /*
+     * @brief Destructor for ESP_8_BIT composite video wrapper class. This
+     * is only useful for freeing self-allocated memory, because I don't know how
+     * to properly tear down rossumur's ESP_8_BIT magic I wrapped.
+     */
+    ~ESP_8_BIT_composite();
+
+    /*
+     * @brief Video subsystem setup: allocate frame buffer and start engine
+     */
     void setup();
+
+    /*
+     * @brief Video subsystem setup: use caller-allocated frame buffer and start engine.
+     *        Caller is responsible for freeing memory.
+     * @param allocated_lines caller-allocated uint8_t*[240], each pointing to uint8_t[256]
+     */
+    void setup_prealloc(uint8_t** allocated_lines);
+
+    /*
+     * @brief Wait for current frame to finish rendering
+     */
     void vsync();
+
+    /*
+     * @brief Retrieve pointer to frame buffer lines array
+     */
     uint8_t** get_lines();
   private:
+    /*
+     * @brief Check to ensure this instance is the first and only allowed instance
+     */
     void instance_check();
+    bool _started;
+    uint8_t* _selfAllocatedBuffer;
 };
 
 #endif // ESP_8_BIT_COMPOSITE_H
