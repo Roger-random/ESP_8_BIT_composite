@@ -1,4 +1,4 @@
-# ESP_8_BIT_composite_video
+# ESP_8_BIT Composite Video Generator
 
 ## Idea:
 
