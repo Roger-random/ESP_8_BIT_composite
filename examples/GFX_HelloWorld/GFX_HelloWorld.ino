@@ -3,6 +3,15 @@
 Example for ESP_8_BIT color composite video generator library on ESP32.
 Connect GPIO25 to signal line, usually the center of composite video plug.
 
+GFX Hello World
+
+This demonstrates using the ESP_8_BIT_GFX class, which inherits from the
+Adafruit GFX base class to deliver an easy to use graphics API. Draws two
+rectangles that cycle around the border of the screen. The amount of corners
+cut off from these rectangle show the amount of overscan on a particular
+screen. In the middle of two rectangles are a bit of text drawn using
+Adafruit GFX print() API.
+
 Copyright (c) Roger Cheng
 
 MIT License
@@ -28,6 +37,7 @@ SOFTWARE.
 
 #include <ESP_8_BIT_GFX.h>
 
+// A list of 8-bit color values that work well in a cycle.
 uint8_t colorCycle[] = {
   0xFF, // White
   0xFE, // Lowering blue
@@ -50,19 +60,23 @@ uint8_t colorCycle[] = {
   0xFF
 };
 
+// Create an instance of the graphics library
 ESP_8_BIT_GFX gfx(true /* = NTSC */, 8 /* = RGB332 color */);
 
 void setup() {
-  // put your setup code here, to run once:
+  // Initial setup of graphics library
   gfx.setup();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // Wait for the next frame to minimize chance of visible tearing
   gfx.vsync();
+
+  // Get the current time and calculate a scaling factor
   unsigned long time = millis();
   float partial_second = (float)(time % 1000)/1000.0;
 
+  // Use time scaling factor to calculate coordinates and colors
   uint8_t movingX = (uint8_t)(255*partial_second);
   uint8_t invertX = 255-movingX;
   uint8_t movingY = (uint8_t)(239*partial_second);
@@ -71,17 +85,22 @@ void loop() {
   uint8_t cycle = colorCycle[(uint8_t)(17*partial_second)];
   uint8_t invertC = 0xFF-cycle;
 
+  // Clear screen
   gfx.fillScreen(0);
+
+  // Draw one rectangle
   gfx.drawLine(movingX, 0,       255,     movingY, cycle);
   gfx.drawLine(255,     movingY, invertX, 239,     cycle);
   gfx.drawLine(invertX, 239,     0,       invertY, cycle);
   gfx.drawLine(0,       invertY, movingX, 0,       cycle);
 
+  // Draw a rectangle with inverted position and color
   gfx.drawLine(invertX, 0,       255,     invertY, invertC);
   gfx.drawLine(255,     invertY, movingX, 239,     invertC);
   gfx.drawLine(movingX, 239,     0,       movingY, invertC);
   gfx.drawLine(0,       movingY, invertX, 0,       invertC);
 
+  // Draw text in the middle of the screen
   gfx.setCursor(25, 80);
   gfx.setTextColor(invertC);
   gfx.setTextSize(2);
