@@ -33,6 +33,10 @@ SOFTWARE.
 
 #include "Arduino.h"
 
+#ifndef ARDUINO_ARCH_ESP32
+#error This library requires ESP32 as it uses ESP32-specific hardware peripheral
+#endif
+
 #include "esp_types.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -53,10 +57,6 @@ SOFTWARE.
 #include "soc/rtc.h"
 #include "soc/rtc_io_reg.h"
 #include "soc/soc.h"
-
-#ifndef ARDUINO_ARCH_ESP32
-#error This library requires ESP32 as it uses ESP32-specific hardware peripheral
-#endif
 
 class ESP_8_BIT_composite
 {
