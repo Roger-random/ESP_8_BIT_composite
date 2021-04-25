@@ -1,6 +1,6 @@
 # ESP_8_BIT Composite Video Generator
 
-## Intent:
+## Intent
 
 The composite video generation code from
 [ESP_8_BIT](https://github.com/rossumur/esp_8_bit)
@@ -10,17 +10,23 @@ write Arduino sketches that output a color composite video signal.
 __Huge thanks to Peter Barrett / rossumur for ESP_8_BIT, without which this
 library would not have been possible.__
 
-## Hardware requirement:
+## Hardware requirement
 * ESP32 (tested on ESP32 DevKitC)
 * Composite video connector, video signal on ESP32 GPIO25.
 
-## Arduino requirement:
+## Arduino requirement
 * [Adafruit GFX Library](https://learn.adafruit.com/adafruit-gfx-graphics-library)
 available from Arduino IDE Library Manager.
 * [Arduino Core for ESP32](https://github.com/espressif/arduino-esp32),
 follow installation directions at that link.
 
-## Options:
+## Installation
+
+1. Download into a folder named "ESP_8_BIT_composite" under your Arduino IDE's
+`libraries` folder.
+2. Restart Arduino IDE.
+
+## Classes
 
 1. `ESP_8_BIT_GFX` offers high-level drawing commands via the
 [Adafruit GFX API](https://learn.adafruit.com/adafruit-gfx-graphics-library).
@@ -28,7 +34,7 @@ Easy to use, but not the highest performance.
 2. `ESP_8_BIT_composite` exposes low-level frame buffer for those who prefer
 to manipulate bytes directly. Maximum performance, but not very easy to use.
 
-## Examples:
+## Examples
 
 1. `GFX_HelloWorld` draws animated rectangles and text, both in changing
 colors, using the `ESP_8_BIT_GFX` API.
@@ -38,12 +44,6 @@ colors, using the `ESP_8_BIT_GFX` API.
 combinations of red (vertical axis) and green (horizontal axis). Uses the
 frame buffer of `ESP_8_BIT_composite` directly. Every second, the entire
 screen is redrawn with one of four possible values of blue in a pulsing cycle.
-
-## Installation:
-
-1. Download into a folder named "ESP_8_BIT_composite" under your Arduino IDE's
-`libraries` folder.
-2. Restart Arduino IDE.
 
 ## Help Wanted
 
