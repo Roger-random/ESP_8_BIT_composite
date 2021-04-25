@@ -9,7 +9,8 @@ Draws 256 blocks on screen, each one filled with a RGB332 color. This
 represents the full palette of available colors while using this library.
 
 Also demonstrates drawing by directly manipulating bytes in frame buffer,
-without using any drawing library functions.
+without using any drawing library functions. This is an advanced usage
+scenario, see GFX_HelloWorld for a more user-friendly interface.
 
 Copyright (c) Roger Cheng
 
@@ -36,20 +37,22 @@ SOFTWARE.
 
 #include <ESP_8_BIT_composite.h>
 
-ESP_8_BIT_composite video_out(true /* = NTSC */);
+ESP_8_BIT_composite videoOut(true /* = NTSC */);
 
 void setup() {
-  video_out.setup();
-  uint8_t** frameBufferLines = video_out.get_lines();
+  videoOut.begin();
+  uint8_t** frameBufferLines = videoOut.getFrameBufferLines();
 
   // Draw all the colors available in our RGB332 palette
-  uint8_t yMask;
+  uint8_t redChannel;
   for (int y = 0; y < 240; y++)
   {
-    yMask = (y/30) << 5;
+    // Y axis determines red channel component, the most significant 3 bits.
+    redChannel = (y/30) << 5;
     for (int x = 0; x < 256; x++)
     {
-      frameBufferLines[y][x] = yMask | x >> 3;
+      // X axis determines green (middle 3 bits) and blue (least significant 2 bits)
+      frameBufferLines[y][x] = redChannel | x >> 3;
     }
   }
 }

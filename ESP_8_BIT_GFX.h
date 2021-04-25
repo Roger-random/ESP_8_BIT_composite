@@ -79,23 +79,17 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     /*
      * @brief Call once to set up the API with self-allocated frame buffer.
      */
-    void setup();
-
-    /*
-     * @brief Call once to set up the API with caller-allocated buffer.
-     * @param allocated_lines Caller-allocated (and freed) buffer.
-     */
-    void setup_prealloc(uint8_t** allocated_lines);
+    void begin();
 
     /*
      * @brief Wait for frame render to complete, to avoid tearing.
      */
-    void vsync();
+    void waitForFrame();
 
     /*
      * @brief Utility to convert from 16-bit RGB565 color to 8-bit RGB332 color
      */
-    uint8_t RGB565toRGB332(uint16_t color);
+    uint8_t convertRGB565toRGB332(uint16_t color);
 
     /*
      * @brief Required Adafruit_GFX override to put a pixel on screen

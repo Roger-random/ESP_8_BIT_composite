@@ -11,7 +11,7 @@ NOTE RE:COLOR
 
 Adafruit GFX is designed for 16-bit (RGB565) color, but ESP_8_BIT video
 only handles 8-bit (RGB332) color. There are two ways to handle this,
-depending on passsing "8" or "16" into the constructor:
+specified by passsing "8" or "16" into the constructor:
 
 8  = Truncate the 16-bit color values and use the lower 8 bits directly as
      RGB332 color. This is faster, but caller needs to know to use 8-bit
@@ -87,32 +87,23 @@ ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth)
 /*
  * @brief Call once to set up the API with self-allocated frame buffer.
  */
-void ESP_8_BIT_GFX::setup()
+void ESP_8_BIT_GFX::begin()
 {
-  _pVideo->setup();
-}
-
-/*
- * @brief Call once to set up the API with caller-allocated buffer.
- * @param allocated_lines Caller-allocated (and freed) buffer.
- */
-void ESP_8_BIT_GFX::setup_prealloc(uint8_t** allocated_lines)
-{
-  _pVideo->setup_prealloc(allocated_lines);
+  _pVideo->begin();
 }
 
 /*
  * @brief Wait for frame render to complete, to avoid tearing.
  */
-void ESP_8_BIT_GFX::vsync()
+void ESP_8_BIT_GFX::waitForFrame()
 {
-  _pVideo->vsync();
+  _pVideo->waitForFrame();
 }
 
 /*
  * @brief Utility to convert from 16-bit RGB565 color to 8-bit RGB332 color
  */
-uint8_t ESP_8_BIT_GFX::RGB565toRGB332(uint16_t color)
+uint8_t ESP_8_BIT_GFX::convertRGB565toRGB332(uint16_t color)
 {
   // Extract most significant 3 red, 3 green and 2 blue bits.
   return (uint8_t)(
@@ -135,7 +126,7 @@ uint8_t ESP_8_BIT_GFX::getColor8(uint16_t color)
       break;
     case 16:
       // Downsample from 16 to 8-bit color.
-      return RGB565toRGB332(color);
+      return convertRGB565toRGB332(color);
       break;
   }
 }
@@ -155,7 +146,7 @@ void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color)
     ESP_LOGE(TAG, "Clamping X");
     x = 255;
   }
-  _pVideo->get_lines()[y][x] = getColor8(color);
+  _pVideo->getFrameBufferLines()[y][x] = getColor8(color);
 }
 
 /*
@@ -164,12 +155,13 @@ void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color)
 void ESP_8_BIT_GFX::fillScreen(uint16_t color)
 {
   uint8_t color8 = getColor8(color);
+  uint8_t** lines = _pVideo->getFrameBufferLines();
 
   // We can't do a single memset() because it is valid for _lines to point
   // into non-contingous pieces of memory. (Necessary when memory is
   // fragmented and we can't get a big enough chunk of contiguous bytes.)
   for(uint8_t y = 0; y < 240; y++)
   {
-    memset(_pVideo->get_lines()[y], color8, 256);
+    memset(lines[y], color8, 256);
   }
 }

@@ -670,13 +670,13 @@ void ESP_8_BIT_composite::instance_check()
 /*
  * @brief Video subsystem setup: allocate frame buffer and start engine
  */
-void ESP_8_BIT_composite::setup()
+void ESP_8_BIT_composite::begin()
 {
   instance_check();
 
   if (_started)
   {
-    ESP_LOGE(TAG, "setup is only allowed to be called once.");
+    ESP_LOGE(TAG, "begin() is only allowed to be called once.");
     ESP_ERROR_CHECK(ESP_FAIL);
   }
   _started = true;
@@ -712,32 +712,9 @@ void ESP_8_BIT_composite::setup()
 }
 
 /*
- * @brief Video subsystem setup: use caller-allocated frame buffer and start engine.
- *        Caller is responsible for freeing memory.
- * @param allocated_lines caller-allocated uint8_t*[240], each pointing to uint8_t[256]
- */
-void ESP_8_BIT_composite::setup_prealloc(uint8_t** allocated_lines)
-{
-  instance_check();
-
-  if (_started)
-  {
-    ESP_LOGE(TAG, "setup is only allowed to be called once.");
-    ESP_ERROR_CHECK(ESP_FAIL);
-  }
-  _started = true;
-
-  _lines = allocated_lines;
-  _selfAllocatedBuffer = NULL;
-
-  // Start video signal generator
-  video_init(4, !_pal_);
-}
-
-/*
  * @brief Wait for current frame to finish rendering
  */
-void ESP_8_BIT_composite::vsync()
+void ESP_8_BIT_composite::waitForFrame()
 {
   instance_check();
 
@@ -747,7 +724,7 @@ void ESP_8_BIT_composite::vsync()
 /*
  * @brief Retrieve pointer to frame buffer lines array
  */
-uint8_t** ESP_8_BIT_composite::get_lines()
+uint8_t** ESP_8_BIT_composite::getFrameBufferLines()
 {
   instance_check();
 

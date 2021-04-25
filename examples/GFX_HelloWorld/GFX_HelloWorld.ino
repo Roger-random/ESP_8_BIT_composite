@@ -61,16 +61,16 @@ uint8_t colorCycle[] = {
 };
 
 // Create an instance of the graphics library
-ESP_8_BIT_GFX gfx(true /* = NTSC */, 8 /* = RGB332 color */);
+ESP_8_BIT_GFX videoOut(true /* = NTSC */, 8 /* = RGB332 color */);
 
 void setup() {
   // Initial setup of graphics library
-  gfx.setup();
+  videoOut.begin();
 }
 
 void loop() {
   // Wait for the next frame to minimize chance of visible tearing
-  gfx.vsync();
+  videoOut.waitForFrame();
 
   // Get the current time and calculate a scaling factor
   unsigned long time = millis();
@@ -86,30 +86,30 @@ void loop() {
   uint8_t invertC = 0xFF-cycle;
 
   // Clear screen
-  gfx.fillScreen(0);
+  videoOut.fillScreen(0);
 
   // Draw one rectangle
-  gfx.drawLine(movingX, 0,       255,     movingY, cycle);
-  gfx.drawLine(255,     movingY, invertX, 239,     cycle);
-  gfx.drawLine(invertX, 239,     0,       invertY, cycle);
-  gfx.drawLine(0,       invertY, movingX, 0,       cycle);
+  videoOut.drawLine(movingX, 0,       255,     movingY, cycle);
+  videoOut.drawLine(255,     movingY, invertX, 239,     cycle);
+  videoOut.drawLine(invertX, 239,     0,       invertY, cycle);
+  videoOut.drawLine(0,       invertY, movingX, 0,       cycle);
 
   // Draw a rectangle with inverted position and color
-  gfx.drawLine(invertX, 0,       255,     invertY, invertC);
-  gfx.drawLine(255,     invertY, movingX, 239,     invertC);
-  gfx.drawLine(movingX, 239,     0,       movingY, invertC);
-  gfx.drawLine(0,       movingY, invertX, 0,       invertC);
+  videoOut.drawLine(invertX, 0,       255,     invertY, invertC);
+  videoOut.drawLine(255,     invertY, movingX, 239,     invertC);
+  videoOut.drawLine(movingX, 239,     0,       movingY, invertC);
+  videoOut.drawLine(0,       movingY, invertX, 0,       invertC);
 
   // Draw text in the middle of the screen
-  gfx.setCursor(25, 80);
-  gfx.setTextColor(invertC);
-  gfx.setTextSize(2);
-  gfx.setTextWrap(false);
-  gfx.print("Adafruit GFX API");
-  gfx.setCursor(110, 120);
-  gfx.setTextColor(0xFF);
-  gfx.print("on");
-  gfx.setCursor(30, 160);
-  gfx.setTextColor(cycle);
-  gfx.print("ESP_8_BIT video");
+  videoOut.setCursor(25, 80);
+  videoOut.setTextColor(invertC);
+  videoOut.setTextSize(2);
+  videoOut.setTextWrap(false);
+  videoOut.print("Adafruit GFX API");
+  videoOut.setCursor(110, 120);
+  videoOut.setTextColor(0xFF);
+  videoOut.print("on");
+  videoOut.setCursor(30, 160);
+  videoOut.setTextColor(cycle);
+  videoOut.print("ESP_8_BIT video");
 }

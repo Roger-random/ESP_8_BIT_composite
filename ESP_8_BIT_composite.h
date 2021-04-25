@@ -77,24 +77,17 @@ class ESP_8_BIT_composite
     /*
      * @brief Video subsystem setup: allocate frame buffer and start engine
      */
-    void setup();
-
-    /*
-     * @brief Video subsystem setup: use caller-allocated frame buffer and start engine.
-     *        Caller is responsible for freeing memory.
-     * @param allocated_lines caller-allocated uint8_t*[240], each pointing to uint8_t[256]
-     */
-    void setup_prealloc(uint8_t** allocated_lines);
+    void begin();
 
     /*
      * @brief Wait for current frame to finish rendering
      */
-    void vsync();
+    void waitForFrame();
 
     /*
      * @brief Retrieve pointer to frame buffer lines array
      */
-    uint8_t** get_lines();
+    uint8_t** getFrameBufferLines();
   private:
     /*
      * @brief Check to ensure this instance is the first and only allowed instance

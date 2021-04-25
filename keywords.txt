@@ -1,9 +1,8 @@
 ESP_8_BIT_composite	KEYWORD1
 ESP_8_BIT_GFX	KEYWORD1
-setup	KEYWORD2
-setup_prealloc	KEYWORD2
-vsync	KEYWORD2
-get_lines	KEYWORD2
-RGB565toRGB332	KEYWORD2
+begin	KEYWORD2
+waitForFrame	KEYWORD2
+getFrameBufferLines	KEYWORD2
+convertRGB565toRGB332	KEYWORD2
 drawPixel	KEYWORD2
 fillScreen	KEYWORD2
