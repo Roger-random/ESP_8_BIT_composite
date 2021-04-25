@@ -39,7 +39,6 @@ SOFTWARE.
 ESP_8_BIT_composite video_out(true /* = NTSC */);
 
 void setup() {
-  // put your setup code here, to run once:
   video_out.setup();
   uint8_t** frameBufferLines = video_out.get_lines();
 
@@ -56,5 +55,4 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 }

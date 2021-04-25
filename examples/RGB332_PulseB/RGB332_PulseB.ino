@@ -39,24 +39,25 @@ SOFTWARE.
 
 ESP_8_BIT_composite video_out(true /* = NTSC */);
 
+// Current value for blue channel
 uint8_t currentB;
+
+// Blue channel change for next frame
 uint8_t deltaB;
 
 void setup() {
-  // put your setup code here, to run once:
   video_out.setup();
-
   currentB = 0;
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   uint8_t yMask;
-
   uint8_t** frameBufferLines = video_out.get_lines();
+
+  // Wait for the next frame to minimize chance of visible tearing
   video_out.vsync();
 
-  // Draw all the colors available in our RGB332 palette
+  // Draw all the colors available in our RGB332 palette with current blue
   for (int y = 0; y < 240; y++)
   {
     yMask = (y/30) << 5;
@@ -66,6 +67,7 @@ void loop() {
     }
   }
 
+  // Update blue channel value for next redraw, pulses 0-1-2-3-2-1-0
   if (0 == currentB)
   {
     deltaB = 1;
@@ -76,5 +78,6 @@ void loop() {
   }
   currentB += deltaB;
 
+  // Wait before next redraw
   delay(1000);
 }
