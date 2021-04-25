@@ -22,9 +22,9 @@ follow installation directions at that link.
 
 ## Options:
 
-1. `ESP_8_BIT_GFX` offers higher-level drawing commands via the
+1. `ESP_8_BIT_GFX` offers high-level drawing commands via the
 [Adafruit GFX API](https://learn.adafruit.com/adafruit-gfx-graphics-library).
-Easey to use, but not the highest performance.
+Easy to use, but not the highest performance.
 2. `ESP_8_BIT_composite` exposes low-level frame buffer for those who prefer
 to manipulate bytes directly. Maximum performance, but not very easy to use.
 
