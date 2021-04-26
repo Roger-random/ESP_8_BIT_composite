@@ -1,4 +1,4 @@
-# ESP_8_BIT Composite Video Generator
+# ESP_8_BIT Color Composite Video Out Library
 
 ## Intent
 
@@ -23,6 +23,10 @@ follow installation directions at that link.
 
 ## Installation
 
+This library can now be installed from within the Arduino desktop IDE via the
+Library Manager. Listed as "ESP_8_BIT Color Composite Video Library"
+
+It can also be installed from this GitHub repository if desired:
 1. Download into a folder named "ESP_8_BIT_composite" under your Arduino IDE's
 `libraries` folder.
 2. Restart Arduino IDE.
