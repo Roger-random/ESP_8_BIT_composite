@@ -50,6 +50,28 @@ combinations of red (vertical axis) and green (horizontal axis). Uses the
 frame buffer of `ESP_8_BIT_composite` directly. Every second, the entire
 screen is redrawn with one of four possible values of blue in a pulsing cycle.
 
+## Screen Size
+
+* Inherited from ESP_8_BIT, the addressible screen size is __256 pixels wide
+and 240 pixels tall__. This means valid X values of 0 to 255 inclusive, and
+valid Y values of 0 to 239 inclusive.
+* When displayed on a standard analog TV with 4:3 aspect ratio, these pixels
+are not square. So `drawCircle()` will look like a squat wide oval on screen
+and not a perfect circle. This is inherent in the system and not considered
+a bug.
+* When displayed on a standard analog TV, the visible image will be slightly
+cropped due to [overscan](https://en.wikipedia.org/wiki/Overscan). This is
+inherent to analog televisions and not considered a bug.
+* The developer-friendly `ESP_8_BIT_GFX` class checks for valid coordinates
+and will clamp within the valid range. So if X is too large (say, 300)
+`drawPixel()` will draw at the maximum X of 255.
+* The raw `ESP_8_BIT_composite` class gives max performance power, but with
+great power comes great responsibility. Caller is responsible for making sure
+X and Y stay within bounds when manipulating frame buffer bytes via
+`getFrameBufferLines()[Y][X]`. Any bugs that use out of range array index
+will at best garble the image, at worse trigger a memory access violation and
+cause your ESP32 to reset.
+
 ## Help Wanted
 
 When I extracted the video signal generation code from ESP_8_BIT, I tried to
@@ -76,7 +98,7 @@ to see if it can be fixed. Note there's no guarantee of support.
 
 ## Tip jar
 
-Just like its predecessor ESP_8_BIT, This project is shared freely with the world.
+Just like its predecessor ESP_8_BIT, this project is shared freely with the world.
 Under the MIT license, you don't owe me anything.
 
 But if you want to toss a few coins my way, use
