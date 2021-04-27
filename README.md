@@ -55,11 +55,11 @@ screen is redrawn with one of four possible values of blue in a pulsing cycle.
 * Inherited from ESP_8_BIT, the addressible screen size is __256 pixels wide
 and 240 pixels tall__. This means valid X values of 0 to 255 inclusive, and
 valid Y values of 0 to 239 inclusive.
-* When displayed on a standard analog TV with 4:3 aspect ratio, these pixels
+  * When displayed on a standard analog TV with 4:3 aspect ratio, these pixels
 are not square. So `drawCircle()` will look like a squat wide oval on screen
-and not a perfect circle. This is inherent in the system and not considered
+and not a perfect circle. This is inherent to the system and not considered
 a bug.
-* When displayed on a standard analog TV, the visible image will be slightly
+  * When displayed on a standard analog TV, the visible image will be slightly
 cropped due to [overscan](https://en.wikipedia.org/wiki/Overscan). This is
 inherent to analog televisions and not considered a bug.
 * The developer-friendly `ESP_8_BIT_GFX` class checks for valid coordinates
@@ -69,8 +69,42 @@ and will clamp within the valid range. So if X is too large (say, 300)
 great power comes great responsibility. Caller is responsible for making sure
 X and Y stay within bounds when manipulating frame buffer bytes via
 `getFrameBufferLines()[Y][X]`. Any bugs that use out of range array index
-will at best garble the image, at worse trigger a memory access violation and
-cause your ESP32 to reset.
+may garble the image, or trigger a memory access violation and cause your ESP32
+to reset, or other general memory corruption nastiness __including the
+potential for security vulnerabilities.__
+
+## 8-Bit Color
+
+Inherited from ESP_8_BIT is a fixed 8-bit color palette in
+[RGB332 format](https://en.wikipedia.org/wiki/List_of_monochrome_and_RGB_color_formats#8-bit_RGB_(also_known_as_3-3-2_bit_RGB)).
+The underlying composite video out code always works with this set of colors.
+(See [Examples](https://github.com/Roger-random/ESP_8_BIT_composite#examples).)
+* The developer-friendly `ESP_8_BIT_GFX` class constructor can be initialized
+in either 8-bit (native) or 16-bit (compatibility) color mode.
+  * Adafruit GFX was written for 16-bit color in
+[RGB565 format](https://learn.adafruit.com/adafruit-gfx-graphics-library/coordinate-system-and-units).
+`ESP_8_BIT_GFX` in 16-bit mode is compatible with existing Adafruit GFX
+code by automatically downconverting color
+while drawing. The resulting colors will be approximate, but they should
+closely resemble the original. Using RGB332 color values while in this mode
+will result in wrong colors on screen due to interpretation as RGB565 colors.
+  * In 8-bit mode, color values given to GFX APIs will be treated as native
+8-bit RGB332 values. This is faster because it skips the color conversion
+process. Using RGB565 color values while in this mode will result in
+wrong colors on screen due to the higher 8 bits being ignored.
+* The raw `ESP_8_BIT_composite` class always works in 8-bit RGB332 color mode.
+
+Sample colors 8-bit RGB332 color format:
+|Name|RGB332|
+|----:|:-----|
+|Black|0x00|
+|Blue|0x03|
+|Green|0x1C|
+|Cyan|0x1F|
+|Red|0xE0|
+|Magenta|0xE3|
+|Yellow|0xFC|
+|White|0xFF|
 
 ## Help Wanted
 
