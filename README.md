@@ -92,9 +92,9 @@ will result in wrong colors on screen due to interpretation as RGB565 colors.
 8-bit RGB332 values. This is faster because it skips the color conversion
 process. Using RGB565 color values while in this mode will result in
 wrong colors on screen due to the higher 8 bits being ignored.
-* The raw `ESP_8_BIT_composite` class always works in 8-bit RGB332 color mode.
+* The raw `ESP_8_BIT_composite` class always works in 8-bit RGB332 color.
 
-Sample colors 8-bit RGB332 color format:
+Sample colors in 8-bit RGB332 format:
 |Name|RGB332|
 |----:|:-----|
 |Black|0x00|
