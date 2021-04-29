@@ -95,16 +95,24 @@ wrong colors on screen due to the higher 8 bits being ignored.
 * The raw `ESP_8_BIT_composite` class always works in 8-bit RGB332 color.
 
 Sample colors in 8-bit RGB332 format:
-|Name|RGB332|
-|----:|:-----|
-|Black|0x00|
-|Blue|0x03|
-|Green|0x1C|
-|Cyan|0x1F|
-|Red|0xE0|
-|Magenta|0xE3|
-|Yellow|0xFC|
-|White|0xFF|
+|Name|RGB332 (binary)|RGB332 (hexadecimal)|
+|----:|:---:|:-----|
+|Black  |0b00000000|0x00|
+|Blue   |0b00000011|0x03|
+|Green  |0b00011100|0x1C|
+|Cyan   |0b00011111|0x1F|
+|Red    |0b11100000|0xE0|
+|Magenta|0b11100011|0xE3|
+|Yellow |0b11111100|0xFC|
+|White  |0b11111111|0xFF|
+
+## 8-bit RGB332 Color Picker Utility
+
+[CLICK HERE](https://roger-random.github.io/RGB332_color_wheel_three.js/)
+for an interactive color picker web app. It shows all 256 possible
+colors in a
+[HSV (hue/saturation/value)](https://en.wikipedia.org/wiki/HSL_and_HSV)
+color cylinder.
 
 ## Help Wanted
 
