@@ -94,13 +94,18 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     /*
      * @brief Required Adafruit_GFX override to put a pixel on screen
      */
-    void drawPixel(int16_t x, int16_t y, uint16_t color);
+    void drawPixel(int16_t x, int16_t y, uint16_t color) override;
 
     /*
-     * @brief Optional Adafruit_GFX override to optimize clearing the screen
+     * @brief Optional Adafruit_GFX overrides for performance
      */
-    void fillScreen(uint16_t color);
+    void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) override;
+    void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) override;
+    void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) override;
+    void fillScreen(uint16_t color) override;
   private:
+    int16_t clampX(int16_t inputX);
+    int16_t clampY(int16_t inputY);
     /*
      * @brief Whether to treat color as 8 or 16 bit color values
      */

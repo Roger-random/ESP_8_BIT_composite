@@ -60,11 +60,14 @@ SOFTWARE.
 
 static const char *TAG = "ESP_8_BIT_GFX";
 
+static const int16_t MAX_Y = 239;
+static const int16_t MAX_X = 255;
+
 /*
  * @brief Expose Adafruit GFX API for ESP_8_BIT composite video generator
  */
 ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth)
-  : Adafruit_GFX(256, 240)
+  : Adafruit_GFX(MAX_X+1, MAX_Y+1)
 {
   _pVideo = new ESP_8_BIT_composite(ntsc);
   if (NULL==_pVideo)
@@ -132,36 +135,171 @@ uint8_t ESP_8_BIT_GFX::getColor8(uint16_t color)
 }
 
 /*
+ * @brief Clamp X coordinate value within valid range
+ */
+int16_t ESP_8_BIT_GFX::clampX(int16_t inputX)
+{
+  if (inputX < 0) {
+    ESP_LOGE(TAG, "Clamping X to 0");
+    return 0;
+  }
+
+  if (inputX > MAX_X) {
+    ESP_LOGE(TAG, "Clamping X to 255");
+    return MAX_X;
+  }
+
+  return inputX;
+}
+
+/*
+ * @brief Clamp Y coordinate value within valid range
+ */
+int16_t ESP_8_BIT_GFX::clampY(int16_t inputY)
+{
+  if (inputY < 0) {
+    ESP_LOGE(TAG, "Clamping Y to 0");
+    return 0;
+  }
+
+  if (inputY > MAX_Y) {
+    ESP_LOGE(TAG, "Clamping Y to 239");
+    return MAX_Y;
+  }
+
+  return inputY;
+}
+
+/*
  * @brief Required Adafruit_GFX override to put a pixel on screen
  */
 void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
-  if (y > 239)
-  {
-    ESP_LOGE(TAG, "Clamping Y");
-    y = 239;
-  }
-  if (x > 255)
-  {
-    ESP_LOGE(TAG, "Clamping X");
-    x = 255;
-  }
+  x = clampX(x);
+  y = clampY(y);
+
   _pVideo->getFrameBufferLines()[y][x] = getColor8(color);
 }
 
-/*
- * @brief Optional Adafruit_GFX override to optimize clearing the screen
- */
+/**************************************************************************/
+/*!
+   @brief    Draw a perfectly vertical line, optimized for ESP_8_BIT
+    @param    x   Top-most x coordinate
+    @param    y   Top-most y coordinate
+    @param    h   Height in pixels
+   @param    color Color to fill with.
+*/
+/**************************************************************************/
+void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+{
+  if (h < 1)
+  {
+    // Don't draw anything for zero or negative height
+    return;
+  }
+
+  int16_t left = clampX(x);
+  int16_t clampedY = clampY(y);
+  int16_t clampedYH = clampY(y+h);
+
+  uint8_t color8 = getColor8(color);
+  uint8_t** lines = _pVideo->getFrameBufferLines();
+
+  startWrite();
+  for(int16_t y = clampedY; y <= clampedYH; y++)
+  {
+    lines[y][x] = color8;
+  }
+  endWrite();
+}
+
+/**************************************************************************/
+/*!
+   @brief    Draw a perfectly horizontal line, optimized for ESP_8_BIT
+    @param    x   Left-most x coordinate
+    @param    y   Left-most y coordinate
+    @param    w   Width in pixels
+   @param    color Color to fill with
+*/
+/**************************************************************************/
+
+void ESP_8_BIT_GFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+{
+  if (w < 1)
+  {
+    // Don't draw anything for zero or negative width
+    return;
+  }
+  int16_t clampedX = clampX(x);
+  int16_t clampedY = clampY(y);
+  int16_t clampedXW = clampX(x+w);
+  int16_t fillWidth = clampedXW-clampedX;
+
+  uint8_t color8 = getColor8(color);
+  uint8_t** lines = _pVideo->getFrameBufferLines();
+
+  startWrite();
+  memset(&(lines[clampedY][clampedX]), color8, fillWidth);
+  endWrite();
+}
+
+/**************************************************************************/
+/*!
+   @brief    Fill a rectangle completely with one color, optimized for ESP_8_BIT
+    @param    x   Top left corner x coordinate
+    @param    y   Top left corner y coordinate
+    @param    w   Width in pixels
+    @param    h   Height in pixels
+   @param    color Color to fill with
+*/
+/**************************************************************************/
+void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+  if (h < 1)
+  {
+    // Don't draw anything for zero or negative height
+    return;
+  }
+  if (w < 1)
+  {
+    // Don't draw anything for zero or negative width
+    return;
+  }
+
+  int16_t clampedX = clampX(x);
+  int16_t clampedXW = clampX(x+w);
+  int16_t fillWidth = clampedXW-clampedX;
+
+  int16_t clampedY = clampY(y);
+  int16_t clampedYH = clampY(y+h);
+
+  uint8_t color8 = getColor8(color);
+  uint8_t** lines = _pVideo->getFrameBufferLines();
+
+  for(uint8_t y = clampedY; y <= clampedYH; y++)
+  {
+    memset(&(lines[y][clampedX]), color8, fillWidth);
+  }
+}
+
+/**************************************************************************/
+/*!
+   @brief    Fill the screen completely with one color, optimized for ESP_8_BIT.
+    @param    color Color to fill with
+*/
+/**************************************************************************/
 void ESP_8_BIT_GFX::fillScreen(uint16_t color)
 {
   uint8_t color8 = getColor8(color);
   uint8_t** lines = _pVideo->getFrameBufferLines();
 
+  startWrite();
   // We can't do a single memset() because it is valid for _lines to point
   // into non-contingous pieces of memory. (Necessary when memory is
   // fragmented and we can't get a big enough chunk of contiguous bytes.)
-  for(uint8_t y = 0; y < 240; y++)
+  for(uint8_t y = 0; y <= MAX_Y; y++)
   {
     memset(lines[y], color8, 256);
   }
+  endWrite();
 }
