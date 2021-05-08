@@ -200,13 +200,13 @@ void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t colo
 
   int16_t left = clampX(x);
   int16_t clampedY = clampY(y);
-  int16_t clampedYH = clampY(y+h);
+  int16_t clampedYH = clampY(y+h-1)+1;
 
   uint8_t color8 = getColor8(color);
   uint8_t** lines = _pVideo->getFrameBufferLines();
 
   startWrite();
-  for(int16_t y = clampedY; y <= clampedYH; y++)
+  for(int16_t y = clampedY; y < clampedYH; y++)
   {
     lines[y][x] = color8;
   }
@@ -232,8 +232,8 @@ void ESP_8_BIT_GFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t colo
   }
   int16_t clampedX = clampX(x);
   int16_t clampedY = clampY(y);
-  int16_t clampedXW = clampX(x+w);
-  int16_t fillWidth = clampedXW-clampedX;
+  int16_t clampedXW = clampX(x+w-1);
+  int16_t fillWidth = clampedXW-clampedX+1;
 
   uint8_t color8 = getColor8(color);
   uint8_t** lines = _pVideo->getFrameBufferLines();
@@ -267,16 +267,16 @@ void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_
   }
 
   int16_t clampedX = clampX(x);
-  int16_t clampedXW = clampX(x+w);
-  int16_t fillWidth = clampedXW-clampedX;
+  int16_t clampedXW = clampX(x+w-1);
+  int16_t fillWidth = clampedXW-clampedX+1;
 
   int16_t clampedY = clampY(y);
-  int16_t clampedYH = clampY(y+h);
+  int16_t clampedYH = clampY(y+h-1)+1;
 
   uint8_t color8 = getColor8(color);
   uint8_t** lines = _pVideo->getFrameBufferLines();
 
-  for(uint8_t y = clampedY; y <= clampedYH; y++)
+  for(uint8_t y = clampedY; y < clampedYH; y++)
   {
     memset(&(lines[y][clampedX]), color8, fillWidth);
   }
