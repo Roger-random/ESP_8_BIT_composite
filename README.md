@@ -49,6 +49,9 @@ allocated by `ESP_8_BIT_composite`. Draws once, no updates.
 combinations of red (vertical axis) and green (horizontal axis). Uses the
 frame buffer of `ESP_8_BIT_composite` directly. Every second, the entire
 screen is redrawn with one of four possible values of blue in a pulsing cycle.
+4. `GFX_Fill_Limits` approaching the performance limits of `ESP_8_BIT_GFX`
+across four different APIs: `fillRect`, `fillCircle`, `drawFastHLine`, and
+`drawFastVLine`.
 
 ## Screen Size
 
