@@ -175,8 +175,12 @@ int16_t ESP_8_BIT_GFX::clampY(int16_t inputY)
  */
 void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
-  x = clampX(x);
-  y = clampY(y);
+  if (x < 0 || x > MAX_X ||
+      y < 0 || y > MAX_Y )
+  {
+    // This pixel is off screen, nothing to draw.
+    return;
+  }
 
   _pVideo->getFrameBufferLines()[y][x] = getColor8(color);
 }
@@ -198,7 +202,18 @@ void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t colo
     return;
   }
 
-  int16_t clampedX = clampX(x);
+  if (x < 0 || x > MAX_X)
+  {
+    // This vertical line is off screen left or right, nothing to draw.
+    return;
+  }
+
+  if (y+h < 0 || y > MAX_Y )
+  {
+    // This vertical line is off screen top or bottom, nothing to draw.
+    return;
+  }
+
   int16_t clampedY = clampY(y);
   int16_t clampedYH = clampY(y+h-1)+1;
 
@@ -208,7 +223,7 @@ void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t colo
   startWrite();
   for(int16_t vertical = clampedY; vertical < clampedYH; vertical++)
   {
-    lines[vertical][clampedX] = color8;
+    lines[vertical][x] = color8;
   }
   endWrite();
 }
@@ -230,8 +245,20 @@ void ESP_8_BIT_GFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t colo
     // Don't draw anything for zero or negative width
     return;
   }
+
+  if (y < 0 || y > MAX_Y)
+  {
+    // This horizontal line is off screen top or bottom, nothing to draw.
+    return;
+  }
+
+  if (x+w < 0 || x > MAX_X)
+  {
+    // This horizontal line is off screen left or right, nothing to draw.
+    return;
+  }
+
   int16_t clampedX = clampX(x);
-  int16_t clampedY = clampY(y);
   int16_t clampedXW = clampX(x+w-1);
   int16_t fillWidth = clampedXW-clampedX+1;
 
@@ -239,7 +266,7 @@ void ESP_8_BIT_GFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t colo
   uint8_t** lines = _pVideo->getFrameBufferLines();
 
   startWrite();
-  memset(&(lines[clampedY][clampedX]), color8, fillWidth);
+  memset(&(lines[y][clampedX]), color8, fillWidth);
   endWrite();
 }
 
@@ -260,9 +287,22 @@ void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_
     // Don't draw anything for zero or negative height
     return;
   }
+
   if (w < 1)
   {
     // Don't draw anything for zero or negative width
+    return;
+  }
+
+  if (x+w < 0 || x > MAX_X)
+  {
+    // This rectangle is off screen left or right, nothing to draw.
+    return;
+  }
+
+  if (y+h < 0 || y > MAX_Y )
+  {
+    // This rectangle is off screen top or bottom, nothing to draw.
     return;
   }
 

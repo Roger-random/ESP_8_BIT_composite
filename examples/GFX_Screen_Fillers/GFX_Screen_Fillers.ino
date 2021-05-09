@@ -178,7 +178,7 @@ void loop() {
       break;
     case 1:
       // A circle that grows from the center of the screen, then shrinks.
-      videoOut.fillCircle(128,120,120*progress,nextHue());
+      videoOut.fillCircle(128,120,130*progress,nextHue());
       break;
     case 2:
       // Draws horizontally across the screen with lots of vertical lines.
@@ -202,8 +202,8 @@ void loop() {
       break;
     case 4:
       // Regression test for https://github.com/Roger-random/ESP_8_BIT_composite/issues/8
-      videoOut.fillCircle(255*progress, 120, 40+20*progress, nextHue());
-      videoOut.fillCircle(128, 239*progress, 40-20*progress, hues[(hueIndex+17)%34]);
+      videoOut.fillCircle(335*progress-40, 120, 40+20*progress, nextHue());
+      videoOut.fillCircle(128, 319*progress-40, 40-20*progress, hues[(hueIndex+17)%34]);
       break;
     default:
       stage = 0;
