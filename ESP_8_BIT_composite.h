@@ -93,8 +93,14 @@ class ESP_8_BIT_composite
      * @brief Check to ensure this instance is the first and only allowed instance
      */
     void instance_check();
+
+    /*
+     * @brief Flag to ensure begin() is called once and only once
+     */
     bool _started;
-    uint8_t* _selfAllocatedBuffer;
+
+    uint8_t* _bufferAbacking;
+    uint8_t* _bufferBbacking;
 };
 
 #endif // ESP_8_BIT_COMPOSITE_H

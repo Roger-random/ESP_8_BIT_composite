@@ -274,7 +274,21 @@ uint32_t us() {
 #define P2 (color)
 #define P3 (color << 8)
 
-static uint8_t** _lines; // Array of 240 lines of pixels
+// Double-buffering: _bufferA and _bufferB will be swapped back and forth.
+static uint8_t** _bufferA;
+static uint8_t** _bufferB;
+
+// _lines may point to either _bufferA or _bufferB, depending on which is being displayed
+// _backBuffer points to whichever one _lines is not pointing to
+static uint8_t** _lines; // Front buffer currently on display
+static uint8_t** _backBuffer; // Back buffer waiting to be swapped to front
+
+// TRUE when _backBuffer is ready to go.
+static bool _swapReady;
+
+// Notification handle once front and back buffers have been swapped.
+static TaskHandle_t _swapCompleteNotify;
+
 volatile int _line_counter = 0;
 volatile int _frame_counter = 0;
 
@@ -550,21 +564,12 @@ void IRAM_ATTR pal_sync(uint16_t* line, int i)
     pal_sync2(line+_line_width/2,_line_width/2, t & 1);
 }
 
-// Wait for blanking before starting drawing
-// avoids tearing in our unsynchonized world
+// Wait for front and back buffers to swap before starting drawing
 void video_sync()
 {
   if (!_lines)
     return;
-  int n = 0;
-  if (_pal_) {
-    if (_line_counter < _active_lines)
-      n = (_active_lines - _line_counter)*1000/15600;
-  } else {
-    if (_line_counter < _active_lines)
-      n = (_active_lines - _line_counter)*1000/15720;
-  }
-  vTaskDelay(n+1);
+  ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 }
 
 // Workhorse ISR handles audio and video updates
@@ -613,6 +618,24 @@ void IRAM_ATTR video_isr(volatile void* vbuf)
     if (_line_counter == _line_count) {
         _line_counter = 0;                      // frame is done
         _frame_counter++;
+
+        // Is the back buffer ready to go?
+        if (_swapReady) {
+          // Swap front and back buffers
+          if (_lines == _bufferA) {
+            _lines = _bufferB;
+            _backBuffer = _bufferA;
+          } else {
+            _lines = _bufferA;
+            _backBuffer = _bufferB;
+          }
+          _swapReady = false;
+
+          // Signal video_sync() swap has completed
+          vTaskNotifyGiveFromISR(
+              _swapCompleteNotify,
+              NULL);
+        }
     }
 
     ISR_END();
@@ -633,8 +656,9 @@ ESP_8_BIT_composite::ESP_8_BIT_composite(int ntsc)
   {
     _instance_ = this;
   }
-  _selfAllocatedBuffer = NULL;
   _started = false;
+  _bufferAbacking = NULL;
+  _bufferBbacking = NULL;
 }
 
 /*
@@ -644,14 +668,24 @@ ESP_8_BIT_composite::ESP_8_BIT_composite(int ntsc)
  */
 ESP_8_BIT_composite::~ESP_8_BIT_composite()
 {
-  if(_selfAllocatedBuffer)
+  if(_bufferAbacking)
   {
-    delete _selfAllocatedBuffer;
-    _selfAllocatedBuffer = NULL;
+    delete _bufferAbacking;
+    _bufferAbacking = NULL;
 
-    delete _lines;
-    _lines= NULL;
+    delete _bufferA;
+    _bufferA= NULL;
   }
+  if(_bufferBbacking)
+  {
+    delete _bufferBbacking;
+    _bufferBbacking = NULL;
+
+    delete _bufferB;
+    _bufferB= NULL;
+  }
+  _lines = NULL;
+  _backBuffer = NULL;
   _instance_ = NULL;
 }
 
@@ -682,30 +716,64 @@ void ESP_8_BIT_composite::begin()
   _started = true;
 
   // Allocate frame buffer from dynamic memory
-  // TODO: Give an option for static memory.
-  uint8_t* _selfAllocatedBuffer = new uint8_t[256*240];
-  if( NULL == _selfAllocatedBuffer )
+  uint8_t* _bufferAbacking = new uint8_t[256*240];
+  if( NULL == _bufferAbacking )
   {
-    ESP_LOGE(TAG, "Frame buffer allocation fail");
+    ESP_LOGE(TAG, "Frame buffer A allocation fail");
     ESP_ERROR_CHECK(ESP_FAIL);
   }
-  memset(_selfAllocatedBuffer, 0, 256*240);
+  memset(_bufferAbacking, 0xE0, 256*240);
+  ESP_LOGI(TAG, "Frame buffer A allocation success");
 
   // Allocate array of lines
-  _lines = new uint8_t*[240];
-  if( NULL == _lines )
+  _bufferA = new uint8_t*[240];
+  if( NULL == _bufferA )
   {
-    ESP_LOGE(TAG, "Frame lines allocation fail");
+    ESP_LOGE(TAG, "Frame lines A allocation fail");
     ESP_ERROR_CHECK(ESP_FAIL);
   }
+  ESP_LOGI(TAG, "Frame lines A allocation success");
 
   // Fill line array with pointers to lines in frame buffer
-  uint8_t* linePointer = _selfAllocatedBuffer;
+  uint8_t* linePointer = _bufferAbacking;
   for (int y = 0; y < 240; y++)
   {
-    _lines[y] = linePointer;
+    _bufferA[y] = linePointer;
     linePointer += 256;
   }
+
+  uint8_t* _bufferBbacking = new uint8_t[256*240];
+  if( NULL == _bufferBbacking )
+  {
+    ESP_LOGE(TAG, "Frame buffer B allocation fail");
+    ESP_ERROR_CHECK(ESP_FAIL);
+  }
+  memset(_bufferBbacking, 0x1C, 256*240);
+  ESP_LOGI(TAG, "Frame buffer B allocation success");
+
+  // Allocate array of lines
+  _bufferB = new uint8_t*[240];
+  if( NULL == _bufferB )
+  {
+    ESP_LOGE(TAG, "Frame lines B allocation fail");
+    ESP_ERROR_CHECK(ESP_FAIL);
+  }
+  ESP_LOGI(TAG, "Frame lines B allocation success");
+
+  // Fill line array with pointers to lines in frame buffer
+  linePointer = _bufferBbacking;
+  for (int y = 0; y < 240; y++)
+  {
+    _bufferB[y] = linePointer;
+    linePointer += 256;
+  }
+
+  _lines = _bufferA;
+  _backBuffer = _bufferB;
+
+  // Initialize double-buffering infrastructure
+  _swapReady = false;
+  _swapCompleteNotify = xTaskGetCurrentTaskHandle();
 
   // Start video signal generator
   video_init(4, !_pal_);
@@ -718,6 +786,8 @@ void ESP_8_BIT_composite::waitForFrame()
 {
   instance_check();
 
+  _swapReady = true;
+
   video_sync();
 }
 
@@ -728,5 +798,5 @@ uint8_t** ESP_8_BIT_composite::getFrameBufferLines()
 {
   instance_check();
 
-  return _lines;
+  return _backBuffer;
 }
