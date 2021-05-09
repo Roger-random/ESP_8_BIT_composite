@@ -140,12 +140,12 @@ uint8_t ESP_8_BIT_GFX::getColor8(uint16_t color)
 int16_t ESP_8_BIT_GFX::clampX(int16_t inputX)
 {
   if (inputX < 0) {
-    ESP_LOGE(TAG, "Clamping X to 0");
+    ESP_LOGV(TAG, "Clamping X to 0");
     return 0;
   }
 
   if (inputX > MAX_X) {
-    ESP_LOGE(TAG, "Clamping X to 255");
+    ESP_LOGV(TAG, "Clamping X to 255");
     return MAX_X;
   }
 
@@ -158,12 +158,12 @@ int16_t ESP_8_BIT_GFX::clampX(int16_t inputX)
 int16_t ESP_8_BIT_GFX::clampY(int16_t inputY)
 {
   if (inputY < 0) {
-    ESP_LOGE(TAG, "Clamping Y to 0");
+    ESP_LOGV(TAG, "Clamping Y to 0");
     return 0;
   }
 
   if (inputY > MAX_Y) {
-    ESP_LOGE(TAG, "Clamping Y to 239");
+    ESP_LOGV(TAG, "Clamping Y to 239");
     return MAX_Y;
   }
 
