@@ -49,9 +49,9 @@ allocated by `ESP_8_BIT_composite`. Draws once, no updates.
 combinations of red (vertical axis) and green (horizontal axis). Uses the
 frame buffer of `ESP_8_BIT_composite` directly. Every second, the entire
 screen is redrawn with one of four possible values of blue in a pulsing cycle.
-4. `GFX_Fill_Limits` approaching the performance limits of `ESP_8_BIT_GFX`
-across four different APIs: `fillRect`, `fillCircle`, `drawFastHLine`, and
-`drawFastVLine`.
+4. `GFX_Screen_Fillers` Demonstrates several of the common ways to put
+graphics on screen. Includes the following APIS: `fillRect`, `fillCircle`,
+`drawFastVLine`, and `drawFastHLine`.
 
 ## Screen Size
 
@@ -113,9 +113,11 @@ Sample colors in 8-bit RGB332 format:
 
 [CLICK HERE](https://roger-random.github.io/RGB332_color_wheel_three.js/)
 for an interactive color picker web app. It shows all 256 possible
-colors in a
+8-bit RGB332 colors in either a
 [HSV (hue/saturation/value)](https://en.wikipedia.org/wiki/HSL_and_HSV)
-color cylinder.
+color cylinder or a
+[RGB (red/green/blue)](https://en.wikipedia.org/wiki/RGB_color_space)
+color cube.
 
 ## Help Wanted
 
