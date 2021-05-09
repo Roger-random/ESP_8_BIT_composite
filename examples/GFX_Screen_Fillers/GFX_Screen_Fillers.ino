@@ -134,8 +134,8 @@ void setup() {
   // Initial setup of graphics library
   videoOut.begin();
 
-  // Start multistage test at beginning
-  stage = 0;
+  // Starting stage for tests cycle
+  stage = 4;
 
   // Start hue cycle at beginning
   hueIndex = 0;
@@ -147,8 +147,7 @@ void loop() {
   float progress = (float)(millis() % millisPerStage)/(float)millisPerStage;
   if (progress < previousProgress)
   {
-    stage++;
-    if (stage > 3) {
+    if (++stage > 4) {
       stage = 0;
     }
   }
@@ -163,7 +162,7 @@ void loop() {
   {
     progress = (1-progress)*2;
   }
-  
+
   // Wait for the next frame to start working on frame buffer
   videoOut.waitForFrame();
 
@@ -200,6 +199,11 @@ void loop() {
       {
         videoOut.drawFastHLine(0, y, 256, nextHue());
       }
+      break;
+    case 4:
+      // Regression test for https://github.com/Roger-random/ESP_8_BIT_composite/issues/8
+      videoOut.fillCircle(255*progress, 120, 40+20*progress, nextHue());
+      videoOut.fillCircle(128, 239*progress, 40-20*progress, hues[(hueIndex+17)%34]);
       break;
     default:
       stage = 0;
