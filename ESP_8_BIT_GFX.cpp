@@ -182,7 +182,9 @@ void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color)
     return;
   }
 
+  startWrite();
   _pVideo->getFrameBufferLines()[y][x] = getColor8(color);
+  endWrite();
 }
 
 /**************************************************************************/
@@ -316,10 +318,12 @@ void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_
   uint8_t color8 = getColor8(color);
   uint8_t** lines = _pVideo->getFrameBufferLines();
 
+  startWrite();
   for(int16_t vertical = clampedY; vertical < clampedYH; vertical++)
   {
     memset(&(lines[vertical][clampedX]), color8, fillWidth);
   }
+  endWrite();
 }
 
 /**************************************************************************/
