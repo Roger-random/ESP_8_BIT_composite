@@ -41,10 +41,15 @@ ESP_8_BIT_composite videoOut(true /* = NTSC */);
 
 void setup() {
   videoOut.begin();
+}
+
+void loop() {
+  uint8_t redChannel;
   uint8_t** frameBufferLines = videoOut.getFrameBufferLines();
 
+  videoOut.waitForFrame();
+
   // Draw all the colors available in our RGB332 palette
-  uint8_t redChannel;
   for (int y = 0; y < 240; y++)
   {
     // Y axis determines red channel component, the most significant 3 bits.
@@ -55,7 +60,4 @@ void setup() {
       frameBufferLines[y][x] = redChannel | x >> 3;
     }
   }
-}
-
-void loop() {
 }
