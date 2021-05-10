@@ -148,7 +148,7 @@ void loop() {
   if (progress < previousProgress)
   {
     printf("Stage %d spent %.2f%% of time waiting for frame. (Higher is better.)\n",
-      stage, videoOut.newPerformanceTrackingSession()*100);
+      stage, (float)videoOut.newPerformanceTrackingSession()/100);
     if (++stage > 4) {
       stage = 0;
     }

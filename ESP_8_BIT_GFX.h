@@ -88,23 +88,23 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     void waitForFrame();
 
     /*
-     * @brief Fraction of time in waitForFrame().
-     * @return Number range from 0.0 to 1.0. Higher values indicate more time
+     * @brief Fraction of time in waitForFrame() in percent of percent.
+     * @return Number range from 0 to 10000. Higher values indicate more time
      * has been spent waiting for buffer swap, implying the rest of the code
      * ran faster and completed more quickly.
      */
-    float getWaitFraction();
+    uint32_t getWaitFraction();
 
     /*
      * @brief Ends the current performance tracking session and start a new
      * one. Useful for isolating sections of code for measurement.
      * @note Sessions are still terminated whenever CPU clock counter
      * overflows (every ~18 seconds @ 240MHz) so some data may still be lost.
-     * @return Number range from 0.0 to 1.0. Higher values indicate more time
+     * @return Number range from 0 to 10000. Higher values indicate more time
      * has been spent waiting for buffer swap, implying the rest of the code
      * ran faster and completed more quickly.
      */
-    float newPerformanceTrackingSession();
+    uint32_t newPerformanceTrackingSession();
 
     /*
      * @brief Utility to convert from 16-bit RGB565 color to 8-bit RGB332 color
@@ -153,8 +153,6 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     /////////////////////////////////////////////////////////////////////////
     //
     //  Performance metric data
-    //
-    //  Only active when logging level is INFO or higher.
     //
     //  The Tensilica core in an ESP32 keeps a count of clock cycles read via
     //  xthal_get_ccount(). This is only a 32-bit unsigned value. So when the
@@ -228,11 +226,11 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
 
     /*
      * @brief Calculate performance metrics, output as INFO log.
-     * @return Number range from 0.0 to 1.0. Higher values indicate more time
+     * @return Number range from 0 to 10000. Higher values indicate more time
      * has been spent waiting for buffer swap, implying the rest of the code
      * ran faster and completed more quickly.
      */
-    float perfData();
+    uint32_t perfData();
 };
 
 #endif // #ifndef ESP_8_BIT_GFX_H

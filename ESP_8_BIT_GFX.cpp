@@ -103,13 +103,13 @@ void ESP_8_BIT_GFX::begin()
 
 /*
  * @brief Calculate performance metrics, output as INFO log.
- * @return Number range from 0.0 to 1.0. Higher values indicate more time
+ * @return Number range from 0 to 10000. Higher values indicate more time
  * has been spent waiting for buffer swap, implying the rest of the code
  * ran faster and completed more quickly.
  */
-float ESP_8_BIT_GFX::perfData()
+uint32_t ESP_8_BIT_GFX::perfData()
 {
-  float fraction = 1.0;
+  uint32_t fraction = getWaitFraction();
 
   if (_perfEnd < _perfStart)
   {
@@ -124,10 +124,12 @@ float ESP_8_BIT_GFX::perfData()
     }
     else
     {
-      fraction = (float)_waitTally/(float)duration;
       uint32_t frames = _pVideo->getRenderedFrameCount() - _frameStart;
       uint32_t swaps = _pVideo->getBufferSwapCount() - _swapStart;
-      ESP_LOGI(TAG, "Waited %.2f%%, missed %d of %d frames", fraction*100, frames-swaps, frames);
+      uint32_t wholePercent = fraction/100;
+      uint32_t decimalPercent = fraction%100;
+      ESP_LOGI(TAG, "Waited %d.%d%%, missed %d of %d frames",
+        wholePercent, decimalPercent, frames-swaps, frames);
     }
   }
   _perfStart = 0;
@@ -181,20 +183,20 @@ void ESP_8_BIT_GFX::waitForFrame()
 }
 
 /*
- * @brief Fraction of time in waitForFrame().
- * @return Number range from 0.0 to 1.0. Higher values indicate more time
+ * @brief Fraction of time in waitForFrame() in percent of percent.
+ * @return Number range from 0 to 10000. Higher values indicate more time
  * has been spent waiting for buffer swap, implying the rest of the code
  * ran faster and completed more quickly.
  */
-float ESP_8_BIT_GFX::getWaitFraction()
+uint32_t ESP_8_BIT_GFX::getWaitFraction()
 {
-  if (_perfEnd > _perfStart)
+  if (_perfEnd > _perfStart + 10000)
   {
-    return (float)_waitTally/(float)(_perfEnd-_perfStart);
+    return _waitTally/((_perfEnd-_perfStart)/10000);
   }
   else
   {
-    return 1.0;
+    return 10000;
   }
 }
 
@@ -203,11 +205,11 @@ float ESP_8_BIT_GFX::getWaitFraction()
  * one. Useful for isolating sections of code for measurement.
  * @note Sessions are still terminated whenever CPU clock counter
  * overflows (every ~18 seconds @ 240MHz) so some data may still be lost.
- * @return Number range from 0.0 to 1.0. Higher values indicate more time
+ * @return Number range from 0 to 10000. Higher values indicate more time
  * has been spent waiting for buffer swap, implying the rest of the code
  * ran faster and completed more quickly.
  */
-float ESP_8_BIT_GFX::newPerformanceTrackingSession()
+uint32_t ESP_8_BIT_GFX::newPerformanceTrackingSession()
 {
   return perfData();
 }
