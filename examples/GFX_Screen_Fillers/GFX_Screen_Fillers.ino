@@ -147,10 +147,11 @@ void loop() {
   float progress = (float)(millis() % millisPerStage)/(float)millisPerStage;
   if (progress < previousProgress)
   {
+    printf("Stage %d spent %.2f%% of time waiting for frame. (Higher is better.)\n",
+      stage, videoOut.newPerformanceTrackingSession()*100);
     if (++stage > 4) {
       stage = 0;
     }
-    printf("Waited %.2f%% of the time\n", videoOut.getWaitFraction()*100);
   }
   previousProgress = progress;
 

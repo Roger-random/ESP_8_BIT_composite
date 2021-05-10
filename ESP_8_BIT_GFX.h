@@ -88,11 +88,23 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     void waitForFrame();
 
     /*
-     * @brief Fraction of time in waitForFrame(). Number range from 0.0 to
-     * 1.0. Lower values indicate less time is spent waiting for buffer
-     * swap, indicating system is more burdened with work.
+     * @brief Fraction of time in waitForFrame().
+     * @return Number range from 0.0 to 1.0. Higher values indicate more time
+     * has been spent waiting for buffer swap, implying the rest of the code
+     * ran faster and completed more quickly.
      */
     float getWaitFraction();
+
+    /*
+     * @brief Ends the current performance tracking session and start a new
+     * one. Useful for isolating sections of code for measurement.
+     * @note Sessions are still terminated whenever CPU clock counter
+     * overflows (every ~18 seconds @ 240MHz) so some data may still be lost.
+     * @return Number range from 0.0 to 1.0. Higher values indicate more time
+     * has been spent waiting for buffer swap, implying the rest of the code
+     * ran faster and completed more quickly.
+     */
+    float newPerformanceTrackingSession();
 
     /*
      * @brief Utility to convert from 16-bit RGB565 color to 8-bit RGB332 color
@@ -141,6 +153,8 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     /////////////////////////////////////////////////////////////////////////
     //
     //  Performance metric data
+    //
+    //  Only active when logging level is INFO or higher.
     //
     //  The Tensilica core in an ESP32 keeps a count of clock cycles read via
     //  xthal_get_ccount(). This is only a 32-bit unsigned value. So when the
@@ -214,8 +228,11 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
 
     /*
      * @brief Calculate performance metrics, output as INFO log.
+     * @return Number range from 0.0 to 1.0. Higher values indicate more time
+     * has been spent waiting for buffer swap, implying the rest of the code
+     * ran faster and completed more quickly.
      */
-    void perfData();
+    float perfData();
 };
 
 #endif // #ifndef ESP_8_BIT_GFX_H

@@ -103,9 +103,14 @@ void ESP_8_BIT_GFX::begin()
 
 /*
  * @brief Calculate performance metrics, output as INFO log.
+ * @return Number range from 0.0 to 1.0. Higher values indicate more time
+ * has been spent waiting for buffer swap, implying the rest of the code
+ * ran faster and completed more quickly.
  */
-void ESP_8_BIT_GFX::perfData()
+float ESP_8_BIT_GFX::perfData()
 {
+  float fraction = 1.0;
+
   if (_perfEnd < _perfStart)
   {
     ESP_LOGE(TAG, "Performance end time is earlier than start time.");
@@ -119,7 +124,7 @@ void ESP_8_BIT_GFX::perfData()
     }
     else
     {
-      float fraction = (float)_waitTally/(float)duration;
+      fraction = (float)_waitTally/(float)duration;
       uint32_t frames = _pVideo->getRenderedFrameCount() - _frameStart;
       uint32_t swaps = _pVideo->getBufferSwapCount() - _swapStart;
       ESP_LOGI(TAG, "Waited %.2f%%, missed %d of %d frames", fraction*100, frames-swaps, frames);
@@ -128,6 +133,8 @@ void ESP_8_BIT_GFX::perfData()
   _perfStart = 0;
   _perfEnd = 0;
   _waitTally = 0;
+
+  return fraction;
 }
 
 /*
@@ -174,9 +181,10 @@ void ESP_8_BIT_GFX::waitForFrame()
 }
 
 /*
- * @brief Fraction of time in waitForFrame(). Number range from 0.0 to
- * 1.0. Lower values indicate less time is spent waiting for buffer
- * swap, indicating system is more burdened with work.
+ * @brief Fraction of time in waitForFrame().
+ * @return Number range from 0.0 to 1.0. Higher values indicate more time
+ * has been spent waiting for buffer swap, implying the rest of the code
+ * ran faster and completed more quickly.
  */
 float ESP_8_BIT_GFX::getWaitFraction()
 {
@@ -190,6 +198,19 @@ float ESP_8_BIT_GFX::getWaitFraction()
   }
 }
 
+/*
+ * @brief Ends the current performance tracking session and start a new
+ * one. Useful for isolating sections of code for measurement.
+ * @note Sessions are still terminated whenever CPU clock counter
+ * overflows (every ~18 seconds @ 240MHz) so some data may still be lost.
+ * @return Number range from 0.0 to 1.0. Higher values indicate more time
+ * has been spent waiting for buffer swap, implying the rest of the code
+ * ran faster and completed more quickly.
+ */
+float ESP_8_BIT_GFX::newPerformanceTrackingSession()
+{
+  return perfData();
+}
 
 /*
  * @brief Utility to convert from 16-bit RGB565 color to 8-bit RGB332 color
