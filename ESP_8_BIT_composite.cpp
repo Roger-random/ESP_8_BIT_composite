@@ -289,8 +289,11 @@ static bool _swapReady;
 // Notification handle once front and back buffers have been swapped.
 static TaskHandle_t _swapCompleteNotify;
 
+// Number of swaps completed
+static uint32_t _swap_counter = 0;
+
 volatile int _line_counter = 0;
-volatile int _frame_counter = 0;
+volatile uint32_t _frame_counter = 0;
 
 int _active_lines;
 int _line_count;
@@ -630,6 +633,7 @@ void IRAM_ATTR video_isr(volatile void* vbuf)
             _backBuffer = _bufferB;
           }
           _swapReady = false;
+          _swap_counter++;
 
           // Signal video_sync() swap has completed
           vTaskNotifyGiveFromISR(
@@ -800,3 +804,20 @@ uint8_t** ESP_8_BIT_composite::getFrameBufferLines()
 
   return _backBuffer;
 }
+
+/*
+ * @brief Number of frames sent to screen
+ */
+uint32_t ESP_8_BIT_composite::getRenderedFrameCount()
+{
+  return _frame_counter;
+}
+
+/*
+ * @brief Number of buffer swaps performed
+ */
+uint32_t ESP_8_BIT_composite::getBufferSwapCount()
+{
+  return _swap_counter;
+}
+

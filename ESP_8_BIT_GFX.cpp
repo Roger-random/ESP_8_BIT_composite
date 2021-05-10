@@ -85,6 +85,12 @@ ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth)
     ESP_LOGE(TAG, "Unsupported color depth");
     ESP_ERROR_CHECK(ESP_FAIL);
   }
+
+  // Initialize performance tracking state
+  _perfStart = 0;
+  _perfEnd = 0;
+  _waitTally = 0;
+
 }
 
 /*
@@ -96,12 +102,94 @@ void ESP_8_BIT_GFX::begin()
 }
 
 /*
- * @brief Wait for frame render to complete, to avoid tearing.
+ * @brief Calculate performance metrics, output as INFO log.
+ */
+void ESP_8_BIT_GFX::perfData()
+{
+  if (_perfEnd < _perfStart)
+  {
+    ESP_LOGE(TAG, "Performance end time is earlier than start time.");
+  }
+  else
+  {
+    uint32_t duration = _perfEnd - _perfStart;
+    if (duration < _waitTally)
+    {
+      ESP_LOGE(TAG, "Overall time duration is less than tally of wait times.");
+    }
+    else
+    {
+      float fraction = (float)_waitTally/(float)duration;
+      uint32_t frames = _pVideo->getRenderedFrameCount() - _frameStart;
+      uint32_t swaps = _pVideo->getBufferSwapCount() - _swapStart;
+      ESP_LOGI(TAG, "Waited %.2f%%, missed %d of %d frames", fraction*100, frames-swaps, frames);
+    }
+  }
+  _perfStart = 0;
+  _perfEnd = 0;
+  _waitTally = 0;
+}
+
+/*
+ * @brief Wait for swap of front and back buffer. Gathers performance
+ * metrics while waiting.
  */
 void ESP_8_BIT_GFX::waitForFrame()
 {
+  // Values to track time spent waiting for swap
+  uint32_t waitStart = xthal_get_ccount();
+  uint32_t waitEnd;
+
+  if (waitStart < _perfEnd)
+  {
+    // CCount overflowed since last call, conclude this session.
+    perfData();
+  }
+  if (0 == _waitTally)
+  {
+    // No wait tally signifies start of new session.
+    _perfStart = waitStart;
+    _frameStart = _pVideo->getRenderedFrameCount();
+    _swapStart = _pVideo->getBufferSwapCount();
+  }
+
+  // Wait for swap of front and back buffer
   _pVideo->waitForFrame();
+
+  // Core clock count after we've finished waiting
+  waitEnd = xthal_get_ccount();
+  if (waitEnd < waitStart)
+  {
+    // CCount overflowed while we were waiting, perform calculation
+    // ignoring the time spent waiting.
+    _perfEnd = waitStart;
+    perfData();
+  }
+  else
+  {
+    // Increase tally of time we spent waiting for buffer swap
+    _waitTally += waitEnd-waitStart;
+    _perfEnd = waitEnd;
+  }
 }
+
+/*
+ * @brief Fraction of time in waitForFrame(). Number range from 0.0 to
+ * 1.0. Lower values indicate less time is spent waiting for buffer
+ * swap, indicating system is more burdened with work.
+ */
+float ESP_8_BIT_GFX::getWaitFraction()
+{
+  if (_perfEnd > _perfStart)
+  {
+    return (float)_waitTally/(float)(_perfEnd-_perfStart);
+  }
+  else
+  {
+    return 1.0;
+  }
+}
+
 
 /*
  * @brief Utility to convert from 16-bit RGB565 color to 8-bit RGB332 color

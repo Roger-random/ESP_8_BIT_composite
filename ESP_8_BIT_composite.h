@@ -88,6 +88,16 @@ class ESP_8_BIT_composite
      * @brief Retrieve pointer to frame buffer lines array
      */
     uint8_t** getFrameBufferLines();
+
+    /*
+     * @brief Number of frames sent to screen
+     */
+    uint32_t getRenderedFrameCount();
+
+    /*
+     * @brief Number of buffer swaps performed
+     */
+    uint32_t getBufferSwapCount();
   private:
     /*
      * @brief Check to ensure this instance is the first and only allowed instance

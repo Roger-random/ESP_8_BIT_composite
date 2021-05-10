@@ -82,9 +82,17 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     void begin();
 
     /*
-     * @brief Wait for frame render to complete, to avoid tearing.
+     * @brief Wait for swap of front and back buffer. Gathers performance
+     * metrics while waiting.
      */
     void waitForFrame();
+
+    /*
+     * @brief Fraction of time in waitForFrame(). Number range from 0.0 to
+     * 1.0. Lower values indicate less time is spent waiting for buffer
+     * swap, indicating system is more burdened with work.
+     */
+    float getWaitFraction();
 
     /*
      * @brief Utility to convert from 16-bit RGB565 color to 8-bit RGB332 color
@@ -104,8 +112,16 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) override;
     void fillScreen(uint16_t color) override;
   private:
+    /*
+     * @brief Given input X-coordinate, return value clamped within valid range.
+     */
     int16_t clampX(int16_t inputX);
+
+    /*
+     * @brief Given input Y-coordinate, return value clamped within valid range.
+     */
     int16_t clampY(int16_t inputY);
+
     /*
      * @brief Whether to treat color as 8 or 16 bit color values
      */
@@ -120,6 +136,86 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
      * @brief Retrieve color to use depending on _colorDepth
      */
     uint8_t getColor8(uint16_t color);
+
+
+    /////////////////////////////////////////////////////////////////////////
+    //
+    //  Performance metric data
+    //
+    //  The Tensilica core in an ESP32 keeps a count of clock cycles read via
+    //  xthal_get_ccount(). This is only a 32-bit unsigned value. So when the
+    //  core is running at 240MHz we have just under 18 seconds before this
+    //  value overflows.
+    //
+    //  Rather than trying to make error-prone and expensive calculations to
+    //  account for clock count overflows, this performance tracking is
+    //  divided up into sessions. Every ~18 seconds the clock count overflow,
+    //  we start a new session. Performance data of gaps between sessions
+    //  are lost.
+    //
+    //  Each sessions retrieves from the underlying rendering class two pieces
+    //  of data: the number of frames rendered to screen and the number of
+    //  buffer swaps performed. These are uint32_t. When they overflow, the
+    //  frame count related statistics will be nonsensical for that session.
+    //  The values should make sense again for the following session.
+    //
+    //  Performance data is only gathered during waitForFrame(), which assumes
+    //  the application is calling waitForFrame() at high rate so we can
+    //  sample performance data. Applications that do not call waitForFrame()
+    //  frequently may experience large session gaps of lost data. If
+    //  waitForFrame() is not called for more than 18 seconds, the data will
+    //  be nonsensical. Fortunately applications that do not make frequent
+    //  frame updates are probably not concerned with performance data anyway.
+    //
+    //  Clock cycle count is a value kept by a core. They are not synchronized
+    //  across multiple ESP32 cores. Trying to calculate from cycle counts
+    //  from different cores will result in nonsensical data. This is usually
+    //  not a problem as the typical usage has Arduino runtime pinned to a
+    //  single core.
+    //
+    //  These metrics track the number of clocks we spend waiting, but that
+    //  includes both idle clock cycles and clock cycles consumed by other
+    //  code. Including our underlying rendering class! The percentage is
+    //  valid for relative comparisons. "Algorithm A leaves lower percentage
+    //  waiting than B, so B is faster" is a valid conclusion. However
+    //  inferring from absolute numbers are not valid. For example "We wait
+    //  50% of the time so we have enough power for twice the work" would be
+    //  wrong. Some of that 50% wait time is used by other code and not free
+    //  for use.
+    //
+    //  The tradeoff for the limitations above is that we have a very
+    //  lightweight performance tracker that imposes minimal overhead. But
+    //  take care interpreting its numbers!
+
+    /*
+     * @brief Number of clock counts spent waiting for frame buffer swap.
+     */
+    uint32_t _waitTally;
+
+    /*
+     * @brief Clock count value at the start of a session.
+     */
+    uint32_t _perfStart;
+
+    /*
+     * @brief Clock count value at the end of a session.
+     */
+    uint32_t _perfEnd;
+
+    /*
+     * @brief Number of frames rendered at the start of a session
+     */
+    uint32_t _frameStart;
+
+    /*
+     * @brief Number of buffer swaps performed at the start of a session
+     */
+    uint32_t _swapStart;
+
+    /*
+     * @brief Calculate performance metrics, output as INFO log.
+     */
+    void perfData();
 };
 
 #endif // #ifndef ESP_8_BIT_GFX_H

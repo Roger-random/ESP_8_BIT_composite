@@ -150,6 +150,7 @@ void loop() {
     if (++stage > 4) {
       stage = 0;
     }
+    printf("Waited %.2f%% of the time\n", videoOut.getWaitFraction()*100);
   }
   previousProgress = progress;
 
