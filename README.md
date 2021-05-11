@@ -6,6 +6,7 @@ The composite video generation code from
 [ESP_8_BIT](https://github.com/rossumur/esp_8_bit)
 extracted and packaged into a standalone Arduino library so everyone can
 write Arduino sketches that output a color composite video signal.
+NTSC and PAL are both supported.
 
 __Huge thanks to Peter Barrett / rossumur for ESP_8_BIT, without which this
 library would not have been possible.__
@@ -118,20 +119,6 @@ for an interactive color picker web app. It shows all 256 possible
 color cylinder or a
 [RGB (red/green/blue)](https://en.wikipedia.org/wiki/RGB_color_space)
 color cube.
-
-## Help Wanted
-
-When I extracted the video signal generation code from ESP_8_BIT, I tried to
-preserve PAL support. Since I only have a NTSC TV, I couldn't verify that PAL
-support is still functional. This is
-[issue #1](https://github.com/Roger-random/ESP_8_BIT_composite/issues/1).
-
-I would appreciate one of the following:
-1. Someone to test PAL and verify it works.
-2. Someone to fix any PAL problems and create a pull request.
-
-Note that I can't do anything about "PAL doesn't work" without a fix, as I
-have no way to diagnose or verify fixes without a PAL TV.
 
 ## Questions?
 
