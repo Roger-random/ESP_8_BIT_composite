@@ -666,9 +666,7 @@ ESP_8_BIT_composite::ESP_8_BIT_composite(int ntsc)
 }
 
 /*
- * @brief Destructor for ESP_8_BIT composite video wrapper class. This
- * is only useful for freeing self-allocated memory, because I don't know how
- * to properly tear down rossumur's ESP_8_BIT magic I wrapped.
+ * @brief Destructor for ESP_8_BIT composite video wrapper class.
  */
 ESP_8_BIT_composite::~ESP_8_BIT_composite()
 {
@@ -687,6 +685,25 @@ ESP_8_BIT_composite::~ESP_8_BIT_composite()
 
     delete _bufferB;
     _bufferB= NULL;
+  }
+  if (_started)
+  {
+    // Free resources by mirroring everything allocated in start_dma()
+    esp_intr_disable(_isr_handle);
+    dac_i2s_disable();
+    dac_output_disable(DAC_CHANNEL_1);
+    if (!_pal_) {
+        rtc_clk_apll_enable(false,0x46,0x97,0x4,1);
+    } else {
+        rtc_clk_apll_enable(false,0x04,0xA4,0x6,1);
+    }
+    for (int i = 0; i < 2; i++) {
+      heap_caps_free((void*)(_dma_desc[i].buf));
+      _dma_desc[i].buf = NULL;
+    }
+    // Missing: There doesn't seem to be a esp_intr_free() to go with esp_intr_alloc()?
+    periph_module_disable(PERIPH_I2S0_MODULE);
+    _started = false;
   }
   _lines = NULL;
   _backBuffer = NULL;
