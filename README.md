@@ -67,8 +67,8 @@ a bug.
 cropped due to [overscan](https://en.wikipedia.org/wiki/Overscan). This is
 inherent to analog televisions and not considered a bug.
 * The developer-friendly `ESP_8_BIT_GFX` class checks for valid coordinates
-and will clamp within the valid range. So if X is too large (say, 300)
-`drawPixel()` will draw at the maximum X of 255.
+and will only draw within the valid range. So if X is too large (say, 300)
+`drawPixel()` will ignore the command and silently do nothing.
 * The raw `ESP_8_BIT_composite` class gives max performance power, but with
 great power comes great responsibility. Caller is responsible for making sure
 X and Y stay within bounds when manipulating frame buffer bytes via
