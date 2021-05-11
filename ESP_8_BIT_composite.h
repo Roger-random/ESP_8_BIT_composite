@@ -109,8 +109,15 @@ class ESP_8_BIT_composite
      */
     bool _started;
 
-    uint8_t* _bufferAbacking;
-    uint8_t* _bufferBbacking;
+    /*
+     * @brief Allocate memory for frame buffer
+     */
+    uint8_t** frameBufferAlloc();
+
+    /*
+     * @brief Free memory allocated by frameBufferAlloc();
+     */
+    void frameBufferFree(uint8_t** frameBuffer);
 };
 
 #endif // ESP_8_BIT_COMPOSITE_H

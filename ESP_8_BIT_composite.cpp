@@ -661,8 +661,8 @@ ESP_8_BIT_composite::ESP_8_BIT_composite(int ntsc)
     _instance_ = this;
   }
   _started = false;
-  _bufferAbacking = NULL;
-  _bufferBbacking = NULL;
+  _bufferA = NULL;
+  _bufferB = NULL;
 }
 
 /*
@@ -670,20 +670,14 @@ ESP_8_BIT_composite::ESP_8_BIT_composite(int ntsc)
  */
 ESP_8_BIT_composite::~ESP_8_BIT_composite()
 {
-  if(_bufferAbacking)
+  if(_bufferA)
   {
-    delete _bufferAbacking;
-    _bufferAbacking = NULL;
-
-    delete _bufferA;
+    frameBufferFree(_bufferA);
     _bufferA= NULL;
   }
-  if(_bufferBbacking)
+  if(_bufferB)
   {
-    delete _bufferBbacking;
-    _bufferBbacking = NULL;
-
-    delete _bufferB;
+    frameBufferFree(_bufferB);
     _bufferB= NULL;
   }
   if (_started)
@@ -736,58 +730,8 @@ void ESP_8_BIT_composite::begin()
   }
   _started = true;
 
-  // Allocate frame buffer from dynamic memory
-  uint8_t* _bufferAbacking = new uint8_t[256*240];
-  if( NULL == _bufferAbacking )
-  {
-    ESP_LOGE(TAG, "Frame buffer A allocation fail");
-    ESP_ERROR_CHECK(ESP_FAIL);
-  }
-  memset(_bufferAbacking, 0xE0, 256*240);
-  ESP_LOGI(TAG, "Frame buffer A allocation success");
-
-  // Allocate array of lines
-  _bufferA = new uint8_t*[240];
-  if( NULL == _bufferA )
-  {
-    ESP_LOGE(TAG, "Frame lines A allocation fail");
-    ESP_ERROR_CHECK(ESP_FAIL);
-  }
-  ESP_LOGI(TAG, "Frame lines A allocation success");
-
-  // Fill line array with pointers to lines in frame buffer
-  uint8_t* linePointer = _bufferAbacking;
-  for (int y = 0; y < 240; y++)
-  {
-    _bufferA[y] = linePointer;
-    linePointer += 256;
-  }
-
-  uint8_t* _bufferBbacking = new uint8_t[256*240];
-  if( NULL == _bufferBbacking )
-  {
-    ESP_LOGE(TAG, "Frame buffer B allocation fail");
-    ESP_ERROR_CHECK(ESP_FAIL);
-  }
-  memset(_bufferBbacking, 0x1C, 256*240);
-  ESP_LOGI(TAG, "Frame buffer B allocation success");
-
-  // Allocate array of lines
-  _bufferB = new uint8_t*[240];
-  if( NULL == _bufferB )
-  {
-    ESP_LOGE(TAG, "Frame lines B allocation fail");
-    ESP_ERROR_CHECK(ESP_FAIL);
-  }
-  ESP_LOGI(TAG, "Frame lines B allocation success");
-
-  // Fill line array with pointers to lines in frame buffer
-  linePointer = _bufferBbacking;
-  for (int y = 0; y < 240; y++)
-  {
-    _bufferB[y] = linePointer;
-    linePointer += 256;
-  }
+  _bufferA = frameBufferAlloc();
+  _bufferB = frameBufferAlloc();
 
   _lines = _bufferA;
   _backBuffer = _bufferB;
@@ -798,6 +742,74 @@ void ESP_8_BIT_composite::begin()
 
   // Start video signal generator
   video_init(4, !_pal_);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+//  Frame buffer memory allocation notes
+//
+// Architecture can tolerate each _line[i] being a separate chunk of memory
+// but allocating in tiny 256 byte chunks is inefficient. (16 bytes of
+// overhead per allocation.) On the opposite end, allocating the entire
+// buffer at once (256*240 = 60kB) demands a large contiguous chunk of
+// memory which might not exist if memory space is fragmented.
+//
+// Compromise: Allocate frame buffer in 4kB chunks. This means each
+// frame buffer is made of 15 4kB chunks instead of a single 60kB chunk.
+//
+// 14 extra allocations * 16 byte overhead = 224 extra bytes, worth it.
+
+const uint16_t linesPerFrame = 240;
+const uint16_t bytesPerLine = 256;
+const uint16_t linesPerChunk = 16;
+const uint16_t chunkSize = bytesPerLine*linesPerChunk;
+const uint16_t chunksPerFrame = 15;
+
+/*
+ * @brief Allocate memory for frame buffer
+ */
+uint8_t** ESP_8_BIT_composite::frameBufferAlloc()
+{
+  uint8_t** lineArray = NULL;
+  uint8_t*  lineChunk = NULL;
+  uint8_t*  lineStep  = NULL;
+
+  lineArray = new uint8_t*[linesPerFrame];
+  if ( NULL == lineArray )
+  {
+    ESP_LOGE(TAG, "Frame lines array allocation fail");
+    ESP_ERROR_CHECK(ESP_FAIL);
+  }
+
+  for (uint8_t chunk = 0; chunk < chunksPerFrame; chunk++)
+  {
+    lineChunk = new uint8_t[chunkSize];
+    if ( NULL == lineChunk )
+    {
+      ESP_LOGE(TAG, "Frame buffer chunk allocation fail");
+      ESP_ERROR_CHECK(ESP_FAIL);
+    }
+    lineStep = lineChunk;
+    for (uint8_t lineIndex = 0; lineIndex < linesPerChunk; lineIndex++)
+    {
+      lineArray[(chunk*linesPerChunk)+lineIndex] = lineStep;
+      lineStep += bytesPerLine;
+    }
+  }
+
+  return lineArray;
+}
+
+/*
+ * @brief Free memory allocated by frameBufferAlloc();
+ */
+void ESP_8_BIT_composite::frameBufferFree(uint8_t** lineArray)
+{
+  for (uint8_t chunk = 0; chunk < chunksPerFrame; chunk++)
+  {
+    free(lineArray[chunk*linesPerChunk]);
+  }
+  free(lineArray);
 }
 
 /*
@@ -837,4 +849,3 @@ uint32_t ESP_8_BIT_composite::getBufferSwapCount()
 {
   return _swap_counter;
 }
-
