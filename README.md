@@ -135,9 +135,10 @@ to see if it can be fixed. Note there's no guarantee of support.
 Just like its predecessor ESP_8_BIT, this project is shared freely with the world.
 Under the MIT license, you don't owe me anything.
 
-But if you want to toss a few coins my way, use
-[my Amazon Associates link](https://amzn.to/3dM0FCn)
-for your next Amazon purchase.
-(Perhaps some [ESP32 development boards](https://amzn.to/3dMdIDQ)?)
+But if you want to toss a few coins my way, you can do so by using my
+Amazon Associates link to buy your
+[ESP32 development boards](https://amzn.to/3dMdIDQ)
+or
+[composite video cables](https://amzn.to/33K9qXP).
 You'll pay the same price, but I get a small
 percentage. As an Amazon Associate I earn from qualifying purchases.
