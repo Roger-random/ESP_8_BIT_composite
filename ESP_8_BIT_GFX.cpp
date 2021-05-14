@@ -172,9 +172,12 @@ void ESP_8_BIT_GFX::waitForFrame()
   if (copyAfterSwap)
   {
     uint8_t** newLineArray = _pVideo->getFrameBufferLines();
-    for(int i = 0; i < 240; i++)
+
+    // This must be kept in sync with how frame buffer memory
+    // is allocated in ESP_8_BIT_composite::frameBufferAlloc()
+    for (uint8_t chunk = 0; chunk < 15; chunk++)
     {
-      memcpy(newLineArray[i], oldLineArray[i], 256);
+      memcpy(newLineArray[chunk*16], oldLineArray[chunk*16], 256*16);
     }
   }
 
