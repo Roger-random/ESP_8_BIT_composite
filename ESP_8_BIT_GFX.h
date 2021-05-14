@@ -123,6 +123,14 @@ class ESP_8_BIT_GFX : public Adafruit_GFX {
     void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) override;
     void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) override;
     void fillScreen(uint16_t color) override;
+
+    /*
+     * @brief Set this to true if the frame buffer should be copied upon every
+     * swap of the front/back buffer. Defaults to false.
+     * @note Some graphics libraries act on delta from previous frame, so the
+     * front and buffers need to be in sync to avoid visual artifacts.
+     */
+    bool copyAfterSwap;
   private:
     /*
      * @brief Given input X-coordinate, return value clamped within valid range.

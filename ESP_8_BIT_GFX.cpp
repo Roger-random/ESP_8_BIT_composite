@@ -86,11 +86,13 @@ ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth)
     ESP_ERROR_CHECK(ESP_FAIL);
   }
 
+  // Default behavior is not to copy buffer upon swap
+  copyAfterSwap = false;
+
   // Initialize performance tracking state
   _perfStart = 0;
   _perfEnd = 0;
   _waitTally = 0;
-
 }
 
 /*
@@ -145,6 +147,8 @@ uint32_t ESP_8_BIT_GFX::perfData()
  */
 void ESP_8_BIT_GFX::waitForFrame()
 {
+  // Track the old lines array in case we need to copy after swap
+  uint8_t** oldLineArray = _pVideo->getFrameBufferLines();
   // Values to track time spent waiting for swap
   uint32_t waitStart = xthal_get_ccount();
   uint32_t waitEnd;
@@ -164,6 +168,15 @@ void ESP_8_BIT_GFX::waitForFrame()
 
   // Wait for swap of front and back buffer
   _pVideo->waitForFrame();
+
+  if (copyAfterSwap)
+  {
+    uint8_t** newLineArray = _pVideo->getFrameBufferLines();
+    for(int i = 0; i < 240; i++)
+    {
+      memcpy(newLineArray[i], oldLineArray[i], 256);
+    }
+  }
 
   // Core clock count after we've finished waiting
   waitEnd = xthal_get_ccount();
