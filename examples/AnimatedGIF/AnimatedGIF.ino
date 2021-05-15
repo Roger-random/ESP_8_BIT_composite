@@ -35,7 +35,7 @@ void GIFDraw(GIFDRAW *pDraw)
 
     usPalette = pDraw->pPalette;
     y = pDraw->iY + pDraw->y; // current line
-    
+
     s = pDraw->pPixels;
     if (pDraw->ucDisposalMethod == 2) // restore to background color
     {
@@ -87,7 +87,7 @@ void GIFDraw(GIFDRAW *pDraw)
           if (c == ucTransparent)
              iCount++;
           else
-             s--; 
+             s--;
         }
         if (iCount)
         {
@@ -118,7 +118,7 @@ void loop() {
   if (gif.open((uint8_t *)jubs_squid_gif, jubs_squid_gif_len, GIFDraw))
   {
     while (gif.playFrame(true, NULL))
-    {      
+    {
       videoOut.waitForFrame();
     }
     videoOut.waitForFrame();
