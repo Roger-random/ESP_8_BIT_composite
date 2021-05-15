@@ -74,7 +74,7 @@ void GIFDraw(GIFDRAW *pDraw)
         if (iCount) // any opaque pixels?
         {
           for(int xOffset = 0; xOffset < iCount; xOffset++ ){
-            videoOut.drawPixel(x + xOffset, y, usTemp[xOffset]);
+            videoOut.drawPixel(pDraw->iX + x + xOffset, y, usTemp[xOffset]);
           }
           x += iCount;
           iCount = 0;
