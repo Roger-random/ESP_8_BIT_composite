@@ -50,9 +50,14 @@ allocated by `ESP_8_BIT_composite`. Draws once, no updates.
 combinations of red (vertical axis) and green (horizontal axis). Uses the
 frame buffer of `ESP_8_BIT_composite` directly. Every second, the entire
 screen is redrawn with one of four possible values of blue in a pulsing cycle.
-4. `GFX_Screen_Fillers` Demonstrates several of the common ways to put
+4. `GFX_Screen_Fillers` demonstrates several of the common ways to put
 graphics on screen. Includes the following APIS: `fillRect`, `fillCircle`,
 `drawFastVLine`, and `drawFastHLine`.
+5. `AnimatedGIF` demonstrates how to use this video out library with the
+[AnimatedGIF decoder library](https://github.com/bitbank2/AnimatedGIF)
+by Larry Bank. Art used in this example is
+[Cat and Galactic Squid](https://twitter.com/MLE_Online/status/1393660363191717888)
+(CC BY-SA 4.0) by Emily Velasco
 
 ## Screen Size
 

@@ -12,7 +12,7 @@ AnimatedGIF library and example was released under Apache 2.0 license.
 https://github.com/bitbank2/AnimatedGIF/blob/master/LICENSE
 
 Cat and Galactic Squid friend by Emily Velasco
-https://twitter.com/MLE_Online/status/1393057530666835970
+https://twitter.com/MLE_Online/status/1393660363191717888
 Released under Creative Commons Attribution-ShareAlike (CC BY-SA 4.0) license
 https://creativecommons.org/licenses/by-sa/4.0/
 
@@ -32,9 +32,8 @@ Then manually adding 'const' to move it out of precious dynamic memory
 ESP_8_BIT_GFX videoOut(true /* = NTSC */, 16 /* = RGB565 colors will be downsampled to 8-bit RGB332 */);
 AnimatedGIF gif;
 
-// Margin to compensate for tube TV overscan
-// https://en.wikipedia.org/wiki/Overscan
-const int margin = 10;
+// Vertical margin to compensate for aspect ratio
+const int margin = 29;
 
 // Draw a line of image to ESP_8_BIT_GFX frame buffer
 void GIFDraw(GIFDRAW *pDraw)
@@ -84,7 +83,7 @@ void GIFDraw(GIFDRAW *pDraw)
         if (iCount) // any opaque pixels?
         {
           for(int xOffset = 0; xOffset < iCount; xOffset++ ){
-            videoOut.drawPixel(margin + pDraw->iX + x + xOffset, margin + y, usTemp[xOffset]);
+            videoOut.drawPixel(pDraw->iX + x + xOffset, margin + y, usTemp[xOffset]);
           }
           x += iCount;
           iCount = 0;
@@ -112,7 +111,7 @@ void GIFDraw(GIFDRAW *pDraw)
       // Translate the 8-bit pixels through the RGB565 palette (already byte reversed)
       for (x=0; x<pDraw->iWidth; x++)
       {
-        videoOut.drawPixel(margin + x,margin + y, usPalette[*s++]);
+        videoOut.drawPixel(x,margin + y, usPalette[*s++]);
       }
     }
 } /* GIFDraw() */
