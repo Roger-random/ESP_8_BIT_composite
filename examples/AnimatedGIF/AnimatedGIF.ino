@@ -13,18 +13,28 @@ https://github.com/bitbank2/AnimatedGIF/blob/master/LICENSE
 
 Cat and Galactic Squid friend by Emily Velasco
 https://twitter.com/MLE_Online/status/1393057530666835970
+Released under Creative Commons Attribution-ShareAlike (CC BY-SA 4.0) license
+https://creativecommons.org/licenses/by-sa/4.0/
+
 Converted to byte array via Unix/Linux command line utility xxd
-xxd -i jubs_squid.gif jubs_squid.h
+
+  xxd -i cat_and_galactic_squid.gif cat_and_galactic_squid.h
+
+Then manually adding 'const' to move it out of precious dynamic memory
 
 */
 
 #include <AnimatedGIF.h>
 #include <ESP_8_BIT_GFX.h>
-#include "jubs_squid.h"
+#include "cat_and_galactic_squid.h"
 
 // Create an instance of the graphics library
 ESP_8_BIT_GFX videoOut(true /* = NTSC */, 16 /* = RGB565 colors will be downsampled to 8-bit RGB332 */);
 AnimatedGIF gif;
+
+// Margin to compensate for tube TV overscan
+// https://en.wikipedia.org/wiki/Overscan
+const int margin = 10;
 
 // Draw a line of image to ESP_8_BIT_GFX frame buffer
 void GIFDraw(GIFDRAW *pDraw)
@@ -74,7 +84,7 @@ void GIFDraw(GIFDRAW *pDraw)
         if (iCount) // any opaque pixels?
         {
           for(int xOffset = 0; xOffset < iCount; xOffset++ ){
-            videoOut.drawPixel(pDraw->iX + x + xOffset, y, usTemp[xOffset]);
+            videoOut.drawPixel(margin + pDraw->iX + x + xOffset, margin + y, usTemp[xOffset]);
           }
           x += iCount;
           iCount = 0;
@@ -102,7 +112,7 @@ void GIFDraw(GIFDRAW *pDraw)
       // Translate the 8-bit pixels through the RGB565 palette (already byte reversed)
       for (x=0; x<pDraw->iWidth; x++)
       {
-        videoOut.drawPixel(x, y, usPalette[*s++]);
+        videoOut.drawPixel(margin + x,margin + y, usPalette[*s++]);
       }
     }
 } /* GIFDraw() */
@@ -111,11 +121,14 @@ void GIFDraw(GIFDRAW *pDraw)
 void setup() {
   videoOut.begin();
   videoOut.copyAfterSwap = true; // gif library depends on data from previous buffer
+  videoOut.fillScreen(0);
+  videoOut.waitForFrame();
+
   gif.begin(LITTLE_ENDIAN_PIXELS);
 }
 
 void loop() {
-  if (gif.open((uint8_t *)jubs_squid_gif, jubs_squid_gif_len, GIFDraw))
+  if (gif.open((uint8_t *)cat_and_galactic_squid_gif, cat_and_galactic_squid_gif_len, GIFDraw))
   {
     while (gif.playFrame(true, NULL))
     {
