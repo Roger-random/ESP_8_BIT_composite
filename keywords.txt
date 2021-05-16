@@ -6,3 +6,6 @@ getFrameBufferLines	KEYWORD2
 convertRGB565toRGB332	KEYWORD2
 drawPixel	KEYWORD2
 fillScreen	KEYWORD2
+getWaitFraction	KEYWORD2
+newPerformanceTrackingSession	KEYWORD2
+copyAfterSwap	KEYWORD2
