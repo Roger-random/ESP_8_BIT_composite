@@ -40,14 +40,11 @@ SOFTWARE.
 ESP_8_BIT_composite videoOut(true /* = NTSC */);
 
 void setup() {
-  videoOut.begin();
-}
-
-void loop() {
   uint8_t redChannel;
-  uint8_t** frameBufferLines = videoOut.getFrameBufferLines();
+  uint8_t** frameBufferLines;
 
-  videoOut.waitForFrame();
+  videoOut.begin();
+  frameBufferLines = videoOut.getFrameBufferLines();
 
   // Draw all the colors available in our RGB332 palette
   for (int y = 0; y < 240; y++)
@@ -60,4 +57,9 @@ void loop() {
       frameBufferLines[y][x] = redChannel | x >> 3;
     }
   }
+
+  videoOut.waitForFrame();
+}
+
+void loop() {
 }
