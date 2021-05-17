@@ -1,6 +1,6 @@
 # ESP_8_BIT Color Composite Video Out Library
 
-## Intent
+## Purpose
 
 The composite video generation code from
 [ESP_8_BIT](https://github.com/rossumur/esp_8_bit)
@@ -10,6 +10,11 @@ NTSC and PAL are both supported.
 
 __Huge thanks to Peter Barrett / rossumur for ESP_8_BIT, without which this
 library would not have been possible.__
+
+For more behind-the-scenes information on how this library came to be, see
+[the development diary](https://newscrewdriver.com/tag/esp_8_bit/)
+which has all the details anyone would ever want plus even more that nobody
+ever asked for.
 
 ## Hardware requirement
 * ESP32 (tested on ESP32 DevKitC)
