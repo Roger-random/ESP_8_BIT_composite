@@ -302,6 +302,25 @@ int16_t ESP_8_BIT_GFX::clampY(int16_t inputY)
  */
 void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
+  // Account for screen rotation. Copied from Adafruit_GFX.cpp
+  int16_t t;
+  switch (rotation) {
+  case 1:
+    t = x;
+    x = WIDTH - 1 - y;
+    y = t;
+    break;
+  case 2:
+    x = WIDTH - 1 - x;
+    y = HEIGHT - 1 - y;
+    break;
+  case 3:
+    t = x;
+    x = y;
+    y = HEIGHT - 1 - t;
+    break;
+  }
+
   if (x < 0 || x > MAX_X ||
       y < 0 || y > MAX_Y )
   {
@@ -325,36 +344,8 @@ void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color)
 /**************************************************************************/
 void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 {
-  if (h < 1)
-  {
-    // Don't draw anything for zero or negative height
-    return;
-  }
-
-  if (x < 0 || x > MAX_X)
-  {
-    // This vertical line is off screen left or right, nothing to draw.
-    return;
-  }
-
-  if (y+h < 0 || y > MAX_Y )
-  {
-    // This vertical line is off screen top or bottom, nothing to draw.
-    return;
-  }
-
-  int16_t clampedY = clampY(y);
-  int16_t clampedYH = clampY(y+h-1)+1;
-
-  uint8_t color8 = getColor8(color);
-  uint8_t** lines = _pVideo->getFrameBufferLines();
-
-  startWrite();
-  for(int16_t vertical = clampedY; vertical < clampedYH; vertical++)
-  {
-    lines[vertical][x] = color8;
-  }
-  endWrite();
+  // Call ESP_8_BIT optimized fillRect with width of one
+  fillRect(x, y, 1, h, color);
 }
 
 /**************************************************************************/
@@ -369,34 +360,8 @@ void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t colo
 
 void ESP_8_BIT_GFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
-  if (w < 1)
-  {
-    // Don't draw anything for zero or negative width
-    return;
-  }
-
-  if (y < 0 || y > MAX_Y)
-  {
-    // This horizontal line is off screen top or bottom, nothing to draw.
-    return;
-  }
-
-  if (x+w < 0 || x > MAX_X)
-  {
-    // This horizontal line is off screen left or right, nothing to draw.
-    return;
-  }
-
-  int16_t clampedX = clampX(x);
-  int16_t clampedXW = clampX(x+w-1);
-  int16_t fillWidth = clampedXW-clampedX+1;
-
-  uint8_t color8 = getColor8(color);
-  uint8_t** lines = _pVideo->getFrameBufferLines();
-
-  startWrite();
-  memset(&(lines[y][clampedX]), color8, fillWidth);
-  endWrite();
+  // Call ESP_8_BIT optimized fillRect with height of one
+  fillRect(x, y, w, 1, color);
 }
 
 /**************************************************************************/
@@ -421,6 +386,33 @@ void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_
   {
     // Don't draw anything for zero or negative width
     return;
+  }
+
+  // Account for screen rotation. Copied from Adafruit_GFX.cpp then added width/height swap.
+  int16_t t;
+  switch (rotation) {
+  case 1:
+    t = x;
+    x = WIDTH - 1 - y;
+    y = t;
+    // Swap width and height
+    t = w;
+    w = h;
+    h = t;
+    break;
+  case 2:
+    x = WIDTH - 1 - x;
+    y = HEIGHT - 1 - y;
+    break;
+  case 3:
+    t = x;
+    x = y;
+    y = HEIGHT - 1 - t;
+    // Swap width and height
+    t = w;
+    w = h;
+    h = t;
+    break;
   }
 
   if (x+w < 0 || x > MAX_X)
