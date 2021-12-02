@@ -64,6 +64,8 @@ by Larry Bank. Art used in this example is
 [Cat and Galactic Squid](https://twitter.com/MLE_Online/status/1393660363191717888)
 by Emily Velasco
 ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/))
+6. `GFX_RotatedText` demonstrates support for Adafruit_GFX::setRotation()
+by rendering text in one of four orientations and one of three text sizes.
 
 ## Screen Size
 
