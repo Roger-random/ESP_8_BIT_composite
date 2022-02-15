@@ -58,66 +58,66 @@ SOFTWARE.
 #include "soc/rtc_io_reg.h"
 #include "soc/soc.h"
 
-class ESP_8_BIT_composite
-{
-  public:
-    /*
-     * @brief Constructor for ESP_8_BIT composite video wrapper class
-     * @param ntsc True (or nonzero) for NTSC mode, False (or zero) for PAL mode
-     */
-    ESP_8_BIT_composite(int ntsc);
+class ESP_8_BIT_composite {
+ public:
+  /*
+   * @brief Constructor for ESP_8_BIT composite video wrapper class
+   * @param ntsc True (or nonzero) for NTSC mode, False (or zero) for PAL mode
+   */
+  ESP_8_BIT_composite(int ntsc);
 
-    /*
-     * @brief Destructor for ESP_8_BIT composite video wrapper class. This
-     * is only useful for freeing self-allocated memory, because I don't know how
-     * to properly tear down rossumur's ESP_8_BIT magic I wrapped.
-     */
-    ~ESP_8_BIT_composite();
+  /*
+   * @brief Destructor for ESP_8_BIT composite video wrapper class. This
+   * is only useful for freeing self-allocated memory, because I don't know how
+   * to properly tear down rossumur's ESP_8_BIT magic I wrapped.
+   */
+  ~ESP_8_BIT_composite();
 
-    /*
-     * @brief Video subsystem setup: allocate frame buffer and start engine
-     */
-    void begin();
+  /*
+   * @brief Video subsystem setup: allocate frame buffer and start engine
+   */
+  void begin();
 
-    /*
-     * @brief Wait for current frame to finish rendering
-     */
-    void waitForFrame();
+  /*
+   * @brief Wait for current frame to finish rendering
+   */
+  void waitForFrame();
 
-    /*
-     * @brief Retrieve pointer to frame buffer lines array
-     */
-    uint8_t** getFrameBufferLines();
+  /*
+   * @brief Retrieve pointer to frame buffer lines array
+   */
+  uint8_t **getFrameBufferLines();
 
-    /*
-     * @brief Number of frames sent to screen
-     */
-    uint32_t getRenderedFrameCount();
+  /*
+   * @brief Number of frames sent to screen
+   */
+  uint32_t getRenderedFrameCount();
 
-    /*
-     * @brief Number of buffer swaps performed
-     */
-    uint32_t getBufferSwapCount();
-  private:
-    /*
-     * @brief Check to ensure this instance is the first and only allowed instance
-     */
-    void instance_check();
+  /*
+   * @brief Number of buffer swaps performed
+   */
+  uint32_t getBufferSwapCount();
 
-    /*
-     * @brief Flag to ensure begin() is called once and only once
-     */
-    bool _started;
+ private:
+  /*
+   * @brief Check to ensure this instance is the first and only allowed instance
+   */
+  void instance_check();
 
-    /*
-     * @brief Allocate memory for frame buffer
-     */
-    uint8_t** frameBufferAlloc();
+  /*
+   * @brief Flag to ensure begin() is called once and only once
+   */
+  bool _started;
 
-    /*
-     * @brief Free memory allocated by frameBufferAlloc();
-     */
-    void frameBufferFree(uint8_t** frameBuffer);
+  /*
+   * @brief Allocate memory for frame buffer
+   */
+  uint8_t **frameBufferAlloc();
+
+  /*
+   * @brief Free memory allocated by frameBufferAlloc();
+   */
+  void frameBufferFree(uint8_t **frameBuffer);
 };
 
-#endif // ESP_8_BIT_COMPOSITE_H
+#endif  // ESP_8_BIT_COMPOSITE_H
