@@ -117,13 +117,13 @@ uint32_t ESP_8_BIT_GFX::perfData() {
       uint32_t swaps          = _pVideo->getBufferSwapCount() - _swapStart;
       uint32_t wholePercent   = fraction / 100;
       uint32_t decimalPercent = fraction % 100;
-            ESP_LOGI(TAG, "Waited %d.%d%%, missed %d of %d frames",
-                     wholePercent, decimalPercent, frames - swaps, frames);
-        }
+      ESP_LOGI(TAG, "Waited %d.%d%%, missed %d of %d frames",
+               wholePercent, decimalPercent, frames - swaps, frames);
     }
-    _perfStart = 0;
-    _perfEnd   = 0;
-    _waitTally = 0;
+  }
+  _perfStart = 0;
+  _perfEnd   = 0;
+  _waitTally = 0;
 
   return fraction;
 }

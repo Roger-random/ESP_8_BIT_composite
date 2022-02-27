@@ -73,7 +73,7 @@ using GRAPHICS_LIB = Adafruit_GFX;
  * @brief Expose Adafruit GFX API for ESP_8_BIT composite video generator
  */
 class ESP_8_BIT_GFX : public GRAPHICS_LIB {
- public:
+public:
   /*
    * @brief Constructor
    * @param ntsc true for NTSC, false for PAL
@@ -138,7 +138,7 @@ class ESP_8_BIT_GFX : public GRAPHICS_LIB {
    */
   bool copyAfterSwap;
 
- private:
+private:
   /*
    * @brief Given input X-coordinate, return value clamped within valid range.
    */

@@ -59,7 +59,7 @@ SOFTWARE.
 #include "soc/soc.h"
 
 class ESP_8_BIT_composite {
- public:
+public:
   /*
    * @brief Constructor for ESP_8_BIT composite video wrapper class
    * @param ntsc True (or nonzero) for NTSC mode, False (or zero) for PAL mode
@@ -98,7 +98,7 @@ class ESP_8_BIT_composite {
    */
   uint32_t getBufferSwapCount();
 
- private:
+private:
   /*
    * @brief Check to ensure this instance is the first and only allowed instance
    */
