@@ -81,11 +81,13 @@ public:
    *        downconversion from 16-bit RGB565 color to 8-bit RGB332.
    */
   ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth);
+  ESP_8_BIT_GFX(void);
 
   /*
    * @brief Call once to set up the API with self-allocated frame buffer.
    */
   void begin();
+  void begin(bool ntsc, uint8_t colorDepth);
 
   /*
    * @brief Wait for swap of front and back buffer. Gathers performance
