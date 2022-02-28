@@ -81,7 +81,7 @@ ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth) : GRAPHICS_LIB(MAX_X
   }
 
   // Default behavior is not to copy buffer upon swap
-  copyAfterSwap = false;
+  _copyAfterSwap = false;
 
   // Initialize performance tracking state
   _perfStart = 0;
@@ -91,7 +91,7 @@ ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth) : GRAPHICS_LIB(MAX_X
 
 ESP_8_BIT_GFX::ESP_8_BIT_GFX(void) : GRAPHICS_LIB(MAX_X + 1, MAX_Y + 1) {
   // Default behavior is not to copy buffer upon swap
-  copyAfterSwap = false;
+  _copyAfterSwap = false;
 
   // Initialize performance tracking state
   _perfStart = 0;
@@ -108,19 +108,20 @@ void ESP_8_BIT_GFX::begin() {
 
 void ESP_8_BIT_GFX::begin(bool ntsc, uint8_t colorDepth) {
   _pVideo = new ESP_8_BIT_composite(ntsc);
-  if (NULL == _pVideo) {
+
+  if (nullptr == _pVideo) {
     ESP_LOGE(TAG, "Video signal generator allocation failed");
     ESP_ERROR_CHECK(ESP_FAIL);
-  }
-
-  if (8 == colorDepth || 16 == colorDepth) {
-    _colorDepth = colorDepth;
   } else {
-    ESP_LOGE(TAG, "Unsupported color depth");
-    ESP_ERROR_CHECK(ESP_FAIL);
-  }
+    if (8 == colorDepth || 16 == colorDepth) {
+      _colorDepth = colorDepth;
+    } else {
+      ESP_LOGE(TAG, "Unsupported color depth");
+      ESP_ERROR_CHECK(ESP_FAIL);
+    }
 
-  _pVideo->begin();
+    _pVideo->begin();
+  }
 }
 
 /*
@@ -169,6 +170,7 @@ void ESP_8_BIT_GFX::waitForFrame() {
     // CCount overflowed since last call, conclude this session.
     perfData();
   }
+
   if (0 == _waitTally) {
     // No wait tally signifies start of new session.
     _perfStart  = waitStart;
@@ -179,7 +181,7 @@ void ESP_8_BIT_GFX::waitForFrame() {
   // Wait for swap of front and back buffer
   _pVideo->waitForFrame();
 
-  if (copyAfterSwap) {
+  if (_copyAfterSwap) {
     uint8_t **newLineArray = _pVideo->getFrameBufferLines();
 
     // This must be kept in sync with how frame buffer memory

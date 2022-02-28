@@ -132,13 +132,18 @@ public:
   void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) override;
   void fillScreen(uint16_t color) override;
 
-  /*
-   * @brief Set this to true if the frame buffer should be copied upon every
-   * swap of the front/back buffer. Defaults to false.
-   * @note Some graphics libraries act on delta from previous frame, so the
-   * front and buffers need to be in sync to avoid visual artifacts.
-   */
-  bool copyAfterSwap;
+
+  void setCopyAfterSwap(bool isSwap) {
+    _copyAfterSwap = isSwap;
+  }
+
+  ESP_8_BIT_composite* getComposite(void) {
+    return _pVideo;
+  }
+
+  void setCompsite(ESP_8_BIT_composite* pVideo) {
+    _pVideo = pVideo;
+  }
 
 private:
   /*
@@ -247,6 +252,14 @@ private:
    * ran faster and completed more quickly.
    */
   uint32_t perfData();
+
+  /*
+   * @brief Set this to true if the frame buffer should be copied upon every
+   * swap of the front/back buffer. Defaults to false.
+   * @note Some graphics libraries act on delta from previous frame, so the
+   * front and buffers need to be in sync to avoid visual artifacts.
+   */
+  bool _copyAfterSwap;
 };
 
 #endif  // #ifndef ESP_8_BIT_GFX_H
