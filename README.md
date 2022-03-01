@@ -17,15 +17,41 @@ which has all the details anyone would ever want plus even more that nobody
 ever asked for.
 
 ## Hardware requirement
-* ESP32 (tested on ESP32 DevKitC)
+* 'Newer' ESP32 (see below)
 * Composite video connector to ESP32 GPIO25 video signal pin.
 * Display device with composite video input port. (Usually an old-school tube TV.)
 
+__ESP32 Details__
+
+This composite video generation code is an extremely clever hack that used several
+ESP32 peripherals in ways they were not originally designed for. See the
+[original author's blog documentation](https://rossumblog.com/2020/05/10/130/)
+for details. It also means older versions of ESP32 could not run this code.
+I don't know exactly which Espressif errata is relevant, but here are some data
+points:
+
+* Known to work
+  * `ESP32-D0WD (revision 1)` (mine)
+  * `ESP32-D0WDQ6 (revision 1)` (thanks [todbot](https://github.com/todbot))
+* Known to NOT work
+  * `ESP32-D0WDQ6 (revision 0)` (thanks [todbot](https://github.com/todbot))
+
+Chip identification obtained from [ESPTool](https://github.com/espressif/esptool)
+with the command `esptool chip_id`
+
 ## Arduino requirement
 * [Adafruit GFX Library](https://learn.adafruit.com/adafruit-gfx-graphics-library)
-available from Arduino IDE Library Manager.
+available from Arduino IDE Library Manager. (Last verified to work with v1.10.13)
 * [Espressif Arduino Core for ESP32](https://github.com/espressif/arduino-esp32),
-follow installation directions at that link.
+follow installation directions at that link. (Last verified to work with v2.0.2)
+* (Optional) [AnimatedGIF](https://github.com/bitbank2/AnimatedGIF),
+for displaying animated GIF files. (Last verified to work with v1.4.7)
+* [Arduino IDE](https://www.arduino.cc/en/software) of course.
+(Last verified to work with v1.8.19)
+
+My Arduino ESP32 configuration:
+
+![image](https://user-images.githubusercontent.com/8559196/156075869-3fb90cdf-711c-4dc0-8c94-f70d2e939b64.png)
 
 ## Installation
 
