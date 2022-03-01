@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The composite video generation code from
+The composite video generation code from SEGA emulator of
 [ESP_8_BIT](https://github.com/rossumur/esp_8_bit)
 extracted and packaged into a standalone Arduino library so everyone can
 write Arduino sketches that output a color composite video signal.
@@ -95,7 +95,7 @@ by rendering text in one of four orientations and one of three text sizes.
 
 ## Screen Size
 
-* Inherited from ESP_8_BIT, the addressible screen size is __256 pixels wide
+* Inherited from SEGA emulator of ESP_8_BIT, the addressible screen size is __256 pixels wide
 and 240 pixels tall__. This means valid X values of 0 to 255 inclusive, and
 valid Y values of 0 to 239 inclusive.
   * When displayed on a standard analog TV with 4:3 aspect ratio, these pixels
