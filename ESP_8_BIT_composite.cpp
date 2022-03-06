@@ -807,7 +807,7 @@ void ESP_8_BIT_composite::waitForFrame() {
  * @brief Retrieve pointer to frame buffer lines array
  */
 uint8_t **ESP_8_BIT_composite::getFrameBufferLines() {
-  instance_check();
+  //instance_check();
 
   return _backBuffer;
 }
