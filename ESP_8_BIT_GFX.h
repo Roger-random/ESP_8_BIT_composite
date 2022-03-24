@@ -60,19 +60,13 @@ SOFTWARE.
 #define ESP_8_BIT_GFX_H
 
 #include "Arduino.h"
-#if defined(USE_EFONT)
-#include <efontWrapper.h>
-using GRAPHICS_LIB = EfontWrapper;
-#else
 #include "Adafruit_GFX.h"
-using GRAPHICS_LIB = Adafruit_GFX;
-#endif
 #include "ESP_8_BIT_composite.h"
 
 /*
  * @brief Expose Adafruit GFX API for ESP_8_BIT composite video generator
  */
-class ESP_8_BIT_GFX : public GRAPHICS_LIB {
+class ESP_8_BIT_GFX : public Adafruit_GFX {
 public:
   /*
    * @brief Constructor
@@ -81,13 +75,11 @@ public:
    *        downconversion from 16-bit RGB565 color to 8-bit RGB332.
    */
   ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth);
-  ESP_8_BIT_GFX(void);
 
   /*
    * @brief Call once to set up the API with self-allocated frame buffer.
    */
   void begin();
-  void begin(bool ntsc, uint8_t colorDepth);
 
   /*
    * @brief Wait for swap of front and back buffer. Gathers performance
@@ -132,17 +124,12 @@ public:
   void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) override;
   void fillScreen(uint16_t color) override;
 
-
   void setCopyAfterSwap(bool isSwap) {
     _copyAfterSwap = isSwap;
   }
 
   ESP_8_BIT_composite* getComposite(void) {
     return _pVideo;
-  }
-
-  void setCompsite(ESP_8_BIT_composite* pVideo) {
-    _pVideo = pVideo;
   }
 
 private:

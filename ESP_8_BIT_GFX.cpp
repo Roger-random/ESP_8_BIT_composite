@@ -66,7 +66,7 @@ static const int16_t MAX_X = 255;
 /*
  * @brief Expose Adafruit GFX API for ESP_8_BIT composite video generator
  */
-ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth) : GRAPHICS_LIB(MAX_X + 1, MAX_Y + 1) {
+ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth) : Adafruit_GFX(MAX_X + 1, MAX_Y + 1) {
   _pVideo = new ESP_8_BIT_composite(ntsc);
   if (NULL == _pVideo) {
     ESP_LOGE(TAG, "Video signal generator allocation failed");
@@ -89,39 +89,11 @@ ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth) : GRAPHICS_LIB(MAX_X
   _waitTally = 0;
 }
 
-ESP_8_BIT_GFX::ESP_8_BIT_GFX(void) : GRAPHICS_LIB(MAX_X + 1, MAX_Y + 1) {
-  // Default behavior is not to copy buffer upon swap
-  _copyAfterSwap = false;
-
-  // Initialize performance tracking state
-  _perfStart = 0;
-  _perfEnd   = 0;
-  _waitTally = 0;
-}
-
 /*
  * @brief Call once to set up the API with self-allocated frame buffer.
  */
 void ESP_8_BIT_GFX::begin() {
   _pVideo->begin();
-}
-
-void ESP_8_BIT_GFX::begin(bool ntsc, uint8_t colorDepth) {
-  _pVideo = new ESP_8_BIT_composite(ntsc);
-
-  if (nullptr == _pVideo) {
-    ESP_LOGE(TAG, "Video signal generator allocation failed");
-    ESP_ERROR_CHECK(ESP_FAIL);
-  } else {
-    if (8 == colorDepth || 16 == colorDepth) {
-      _colorDepth = colorDepth;
-    } else {
-      ESP_LOGE(TAG, "Unsupported color depth");
-      ESP_ERROR_CHECK(ESP_FAIL);
-    }
-
-    _pVideo->begin();
-  }
 }
 
 /*
