@@ -66,33 +66,40 @@ static const int16_t MAX_X = 255;
 /*
  * @brief Expose Adafruit GFX API for ESP_8_BIT composite video generator
  */
-ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth) : Adafruit_GFX(MAX_X + 1, MAX_Y + 1) {
+ESP_8_BIT_GFX::ESP_8_BIT_GFX(bool ntsc, uint8_t colorDepth)
+  : Adafruit_GFX(MAX_X+1, MAX_Y+1)
+{
   _pVideo = new ESP_8_BIT_composite(ntsc);
-  if (NULL == _pVideo) {
+  if (NULL==_pVideo)
+  {
     ESP_LOGE(TAG, "Video signal generator allocation failed");
     ESP_ERROR_CHECK(ESP_FAIL);
   }
 
-  if (8 == colorDepth || 16 == colorDepth) {
+  if (8 == colorDepth || 16 == colorDepth)
+  {
     _colorDepth = colorDepth;
-  } else {
+  }
+  else
+  {
     ESP_LOGE(TAG, "Unsupported color depth");
     ESP_ERROR_CHECK(ESP_FAIL);
   }
 
   // Default behavior is not to copy buffer upon swap
-  _copyAfterSwap = false;
+  copyAfterSwap = false;
 
   // Initialize performance tracking state
   _perfStart = 0;
-  _perfEnd   = 0;
+  _perfEnd = 0;
   _waitTally = 0;
 }
 
 /*
  * @brief Call once to set up the API with self-allocated frame buffer.
  */
-void ESP_8_BIT_GFX::begin() {
+void ESP_8_BIT_GFX::begin()
+{
   _pVideo->begin();
 }
 
@@ -102,26 +109,33 @@ void ESP_8_BIT_GFX::begin() {
  * has been spent waiting for buffer swap, implying the rest of the code
  * ran faster and completed more quickly.
  */
-uint32_t ESP_8_BIT_GFX::perfData() {
+uint32_t ESP_8_BIT_GFX::perfData()
+{
   uint32_t fraction = getWaitFraction();
 
-  if (_perfEnd < _perfStart) {
+  if (_perfEnd < _perfStart)
+  {
     ESP_LOGE(TAG, "Performance end time is earlier than start time.");
-  } else {
+  }
+  else
+  {
     uint32_t duration = _perfEnd - _perfStart;
-    if (duration < _waitTally) {
+    if (duration < _waitTally)
+    {
       ESP_LOGE(TAG, "Overall time duration is less than tally of wait times.");
-    } else {
-      uint32_t frames         = _pVideo->getRenderedFrameCount() - _frameStart;
-      uint32_t swaps          = _pVideo->getBufferSwapCount() - _swapStart;
-      uint32_t wholePercent   = fraction / 100;
-      uint32_t decimalPercent = fraction % 100;
+    }
+    else
+    {
+      uint32_t frames = _pVideo->getRenderedFrameCount() - _frameStart;
+      uint32_t swaps = _pVideo->getBufferSwapCount() - _swapStart;
+      uint32_t wholePercent = fraction/100;
+      uint32_t decimalPercent = fraction%100;
       ESP_LOGI(TAG, "Waited %d.%d%%, missed %d of %d frames",
-               wholePercent, decimalPercent, frames - swaps, frames);
+        wholePercent, decimalPercent, frames-swaps, frames);
     }
   }
   _perfStart = 0;
-  _perfEnd   = 0;
+  _perfEnd = 0;
   _waitTally = 0;
 
   return fraction;
@@ -131,48 +145,55 @@ uint32_t ESP_8_BIT_GFX::perfData() {
  * @brief Wait for swap of front and back buffer. Gathers performance
  * metrics while waiting.
  */
-void ESP_8_BIT_GFX::waitForFrame() {
+void ESP_8_BIT_GFX::waitForFrame()
+{
   // Track the old lines array in case we need to copy after swap
-  uint8_t **oldLineArray = _pVideo->getFrameBufferLines();
+  uint8_t** oldLineArray = _pVideo->getFrameBufferLines();
   // Values to track time spent waiting for swap
   uint32_t waitStart = xthal_get_ccount();
   uint32_t waitEnd;
 
-  if (waitStart < _perfEnd) {
+  if (waitStart < _perfEnd)
+  {
     // CCount overflowed since last call, conclude this session.
     perfData();
   }
-
-  if (0 == _waitTally) {
+  if (0 == _waitTally)
+  {
     // No wait tally signifies start of new session.
-    _perfStart  = waitStart;
+    _perfStart = waitStart;
     _frameStart = _pVideo->getRenderedFrameCount();
-    _swapStart  = _pVideo->getBufferSwapCount();
+    _swapStart = _pVideo->getBufferSwapCount();
   }
 
   // Wait for swap of front and back buffer
   _pVideo->waitForFrame();
 
-  if (_copyAfterSwap) {
-    uint8_t **newLineArray = _pVideo->getFrameBufferLines();
+  if (copyAfterSwap)
+  {
+    uint8_t** newLineArray = _pVideo->getFrameBufferLines();
 
     // This must be kept in sync with how frame buffer memory
     // is allocated in ESP_8_BIT_composite::frameBufferAlloc()
-    for (uint8_t chunk = 0; chunk < 15; chunk++) {
-      memcpy(newLineArray[chunk * 16], oldLineArray[chunk * 16], 256 * 16);
+    for (uint8_t chunk = 0; chunk < 15; chunk++)
+    {
+      memcpy(newLineArray[chunk*16], oldLineArray[chunk*16], 256*16);
     }
   }
 
   // Core clock count after we've finished waiting
   waitEnd = xthal_get_ccount();
-  if (waitEnd < waitStart) {
+  if (waitEnd < waitStart)
+  {
     // CCount overflowed while we were waiting, perform calculation
     // ignoring the time spent waiting.
     _perfEnd = waitStart;
     perfData();
-  } else {
+  }
+  else
+  {
     // Increase tally of time we spent waiting for buffer swap
-    _waitTally += waitEnd - waitStart;
+    _waitTally += waitEnd-waitStart;
     _perfEnd = waitEnd;
   }
 }
@@ -183,10 +204,14 @@ void ESP_8_BIT_GFX::waitForFrame() {
  * has been spent waiting for buffer swap, implying the rest of the code
  * ran faster and completed more quickly.
  */
-uint32_t ESP_8_BIT_GFX::getWaitFraction() {
-  if (_perfEnd > _perfStart + 10000) {
-    return _waitTally / ((_perfEnd - _perfStart) / 10000);
-  } else {
+uint32_t ESP_8_BIT_GFX::getWaitFraction()
+{
+  if (_perfEnd > _perfStart + 10000)
+  {
+    return _waitTally/((_perfEnd-_perfStart)/10000);
+  }
+  else
+  {
     return 10000;
   }
 }
@@ -200,25 +225,31 @@ uint32_t ESP_8_BIT_GFX::getWaitFraction() {
  * has been spent waiting for buffer swap, implying the rest of the code
  * ran faster and completed more quickly.
  */
-uint32_t ESP_8_BIT_GFX::newPerformanceTrackingSession() {
+uint32_t ESP_8_BIT_GFX::newPerformanceTrackingSession()
+{
   return perfData();
 }
 
 /*
  * @brief Utility to convert from 16-bit RGB565 color to 8-bit RGB332 color
  */
-uint8_t ESP_8_BIT_GFX::convertRGB565toRGB332(uint16_t color) {
+uint8_t ESP_8_BIT_GFX::convertRGB565toRGB332(uint16_t color)
+{
   // Extract most significant 3 red, 3 green and 2 blue bits.
-  return (uint8_t)((color & 0xE000) >> 8 |
-                   (color & 0x0700) >> 6 |
-                   (color & 0x0018) >> 3);
+  return (uint8_t)(
+        (color & 0xE000) >> 8 |
+        (color & 0x0700) >> 6 |
+        (color & 0x0018) >> 3
+      );
 }
 
 /*
  * @brief Retrieve color to use depending on _colorDepth
  */
-uint8_t ESP_8_BIT_GFX::getColor8(uint16_t color) {
-  switch (_colorDepth) {
+uint8_t ESP_8_BIT_GFX::getColor8(uint16_t color)
+{
+  switch(_colorDepth)
+  {
     case 8:
       // Use lower 8 bits directly
       return (uint8_t)color;
@@ -228,14 +259,13 @@ uint8_t ESP_8_BIT_GFX::getColor8(uint16_t color) {
       return convertRGB565toRGB332(color);
       break;
   }
-
-  return -1;
 }
 
 /*
  * @brief Clamp X coordinate value within valid range
  */
-int16_t ESP_8_BIT_GFX::clampX(int16_t inputX) {
+int16_t ESP_8_BIT_GFX::clampX(int16_t inputX)
+{
   if (inputX < 0) {
     ESP_LOGV(TAG, "Clamping X to 0");
     return 0;
@@ -252,7 +282,8 @@ int16_t ESP_8_BIT_GFX::clampX(int16_t inputX) {
 /*
  * @brief Clamp Y coordinate value within valid range
  */
-int16_t ESP_8_BIT_GFX::clampY(int16_t inputY) {
+int16_t ESP_8_BIT_GFX::clampY(int16_t inputY)
+{
   if (inputY < 0) {
     ESP_LOGV(TAG, "Clamping Y to 0");
     return 0;
@@ -269,9 +300,30 @@ int16_t ESP_8_BIT_GFX::clampY(int16_t inputY) {
 /*
  * @brief Required Adafruit_GFX override to put a pixel on screen
  */
-void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color) {
+void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color)
+{
+  // Account for screen rotation. Copied from Adafruit_GFX.cpp
+  int16_t t;
+  switch (rotation) {
+  case 1:
+    t = x;
+    x = WIDTH - 1 - y;
+    y = t;
+    break;
+  case 2:
+    x = WIDTH - 1 - x;
+    y = HEIGHT - 1 - y;
+    break;
+  case 3:
+    t = x;
+    x = y;
+    y = HEIGHT - 1 - t;
+    break;
+  }
+
   if (x < 0 || x > MAX_X ||
-      y < 0 || y > MAX_Y) {
+      y < 0 || y > MAX_Y )
+  {
     // This pixel is off screen, nothing to draw.
     return;
   }
@@ -290,33 +342,10 @@ void ESP_8_BIT_GFX::drawPixel(int16_t x, int16_t y, uint16_t color) {
    @param    color Color to fill with.
 */
 /**************************************************************************/
-void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
-  if (h < 1) {
-    // Don't draw anything for zero or negative height
-    return;
-  }
-
-  if (x < 0 || x > MAX_X) {
-    // This vertical line is off screen left or right, nothing to draw.
-    return;
-  }
-
-  if (y + h < 0 || y > MAX_Y) {
-    // This vertical line is off screen top or bottom, nothing to draw.
-    return;
-  }
-
-  int16_t clampedY  = clampY(y);
-  int16_t clampedYH = clampY(y + h - 1) + 1;
-
-  uint8_t   color8 = getColor8(color);
-  uint8_t **lines  = _pVideo->getFrameBufferLines();
-
-  startWrite();
-  for (int16_t vertical = clampedY; vertical < clampedYH; vertical++) {
-    lines[vertical][x] = color8;
-  }
-  endWrite();
+void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+{
+  // Call ESP_8_BIT optimized fillRect with width of one
+  fillRect(x, y, 1, h, color);
 }
 
 /**************************************************************************/
@@ -329,32 +358,10 @@ void ESP_8_BIT_GFX::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t colo
 */
 /**************************************************************************/
 
-void ESP_8_BIT_GFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
-  if (w < 1) {
-    // Don't draw anything for zero or negative width
-    return;
-  }
-
-  if (y < 0 || y > MAX_Y) {
-    // This horizontal line is off screen top or bottom, nothing to draw.
-    return;
-  }
-
-  if (x + w < 0 || x > MAX_X) {
-    // This horizontal line is off screen left or right, nothing to draw.
-    return;
-  }
-
-  int16_t clampedX  = clampX(x);
-  int16_t clampedXW = clampX(x + w - 1);
-  int16_t fillWidth = clampedXW - clampedX + 1;
-
-  uint8_t   color8 = getColor8(color);
-  uint8_t **lines  = _pVideo->getFrameBufferLines();
-
-  startWrite();
-  memset(&(lines[y][clampedX]), color8, fillWidth);
-  endWrite();
+void ESP_8_BIT_GFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+{
+  // Call ESP_8_BIT optimized fillRect with height of one
+  fillRect(x, y, w, 1, color);
 }
 
 /**************************************************************************/
@@ -367,39 +374,72 @@ void ESP_8_BIT_GFX::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t colo
    @param    color Color to fill with
 */
 /**************************************************************************/
-void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
-  if (h < 1) {
+void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+  if (h < 1)
+  {
     // Don't draw anything for zero or negative height
     return;
   }
 
-  if (w < 1) {
+  if (w < 1)
+  {
     // Don't draw anything for zero or negative width
     return;
   }
 
-  if (x + w < 0 || x > MAX_X) {
+  // Account for screen rotation. Copied from Adafruit_GFX.cpp then added width/height swap.
+  int16_t t;
+  switch (rotation) {
+  case 1:
+    t = x;
+    x = WIDTH - 1 - y;
+    y = t;
+    // Swap width and height
+    t = w;
+    w = h;
+    h = t;
+    break;
+  case 2:
+    x = WIDTH - 1 - x;
+    y = HEIGHT - 1 - y;
+    break;
+  case 3:
+    t = x;
+    x = y;
+    y = HEIGHT - 1 - t;
+    // Swap width and height
+    t = w;
+    w = h;
+    h = t;
+    break;
+  }
+
+  if (x+w < 0 || x > MAX_X)
+  {
     // This rectangle is off screen left or right, nothing to draw.
     return;
   }
 
-  if (y + h < 0 || y > MAX_Y) {
+  if (y+h < 0 || y > MAX_Y )
+  {
     // This rectangle is off screen top or bottom, nothing to draw.
     return;
   }
 
-  int16_t clampedX  = clampX(x);
-  int16_t clampedXW = clampX(x + w - 1);
-  int16_t fillWidth = clampedXW - clampedX + 1;
+  int16_t clampedX = clampX(x);
+  int16_t clampedXW = clampX(x+w-1);
+  int16_t fillWidth = clampedXW-clampedX+1;
 
-  int16_t clampedY  = clampY(y);
-  int16_t clampedYH = clampY(y + h - 1) + 1;
+  int16_t clampedY = clampY(y);
+  int16_t clampedYH = clampY(y+h-1)+1;
 
-  uint8_t   color8 = getColor8(color);
-  uint8_t **lines  = _pVideo->getFrameBufferLines();
+  uint8_t color8 = getColor8(color);
+  uint8_t** lines = _pVideo->getFrameBufferLines();
 
   startWrite();
-  for (int16_t vertical = clampedY; vertical < clampedYH; vertical++) {
+  for(int16_t vertical = clampedY; vertical < clampedYH; vertical++)
+  {
     memset(&(lines[vertical][clampedX]), color8, fillWidth);
   }
   endWrite();
@@ -411,15 +451,17 @@ void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_
     @param    color Color to fill with
 */
 /**************************************************************************/
-void ESP_8_BIT_GFX::fillScreen(uint16_t color) {
-  uint8_t   color8 = getColor8(color);
-  uint8_t **lines  = _pVideo->getFrameBufferLines();
+void ESP_8_BIT_GFX::fillScreen(uint16_t color)
+{
+  uint8_t color8 = getColor8(color);
+  uint8_t** lines = _pVideo->getFrameBufferLines();
 
   startWrite();
   // We can't do a single memset() because it is valid for _lines to point
   // into non-contingous pieces of memory. (Necessary when memory is
   // fragmented and we can't get a big enough chunk of contiguous bytes.)
-  for (uint8_t y = 0; y <= MAX_Y; y++) {
+  for(uint8_t y = 0; y <= MAX_Y; y++)
+  {
     memset(lines[y], color8, 256);
   }
   endWrite();
