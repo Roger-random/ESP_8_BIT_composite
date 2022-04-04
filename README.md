@@ -33,6 +33,7 @@ points:
 * Known to work
   * `ESP32-D0WD (revision 1)` (mine)
   * `ESP32-D0WDQ6 (revision 1)` (thanks [todbot](https://github.com/todbot))
+  * `ESP32-PICO-D4 (revision 1)` (thanks [alex1115alex](https://github.com/alex1115alex))
 * Known to NOT work
   * `ESP32-D0WDQ6 (revision 0)` (thanks [todbot](https://github.com/todbot))
 
