@@ -390,8 +390,6 @@ void IRAM_ATTR blit_pal(uint8_t* src, uint16_t* dst)
     int left = 0;
     int right = 256;
     uint8_t mask = 0xFF;
-    uint8_t c0,c1,c2,c3,c4;
-    uint8_t y1,y2,y3;
 
     // 192 of 288 color clocks wide: roughly correct aspect ratio
     dst += 88;
@@ -458,7 +456,6 @@ uint32_t _isr_us = 0;
 // draw a line of game in NTSC
 void IRAM_ATTR blit(uint8_t* src, uint16_t* dst)
 {
-    uint32_t* d = (uint32_t*)dst;
     const uint32_t* p = _palette;
     uint32_t color,c;
     uint32_t mask = 0xFF;
