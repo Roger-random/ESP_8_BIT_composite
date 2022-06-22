@@ -70,7 +70,7 @@ static esp_err_t start_dma(int line_width,int samples_per_cc, int ch = 1)
     for (int i = 0; i < 2; i++) {
         int n = line_width*2*ch;
         if (n >= 4092) {
-            printf("DMA chunk too big:%s\n",n);
+            printf("DMA chunk too big:%d\n",n);
             return -1;
         }
         _dma_desc[i].buf = (uint8_t*)heap_caps_calloc(1, n, MALLOC_CAP_DMA);
