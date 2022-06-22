@@ -258,6 +258,12 @@ uint8_t ESP_8_BIT_GFX::getColor8(uint16_t color)
       // Downsample from 16 to 8-bit color.
       return convertRGB565toRGB332(color);
       break;
+    default:
+      // Error: color depth needs to be 8 or 16.
+      ESP_LOGE(TAG, "Invalid color depth.");
+
+      // In case of error, draw everything as gray: 0x49 in RGB332
+      return 0x49;
   }
 }
 
