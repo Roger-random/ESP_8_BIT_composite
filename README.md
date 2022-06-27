@@ -42,9 +42,9 @@ with the command `esptool chip_id`
 
 ## Arduino requirement
 * [Adafruit GFX Library](https://learn.adafruit.com/adafruit-gfx-graphics-library)
-available from Arduino IDE Library Manager. (Last verified to work with v1.10.13)
+available from Arduino IDE Library Manager. (Last verified to work with v1.11.2)
 * [Espressif Arduino Core for ESP32](https://github.com/espressif/arduino-esp32),
-follow installation directions at that link. (Last verified to work with v2.0.2)
+follow installation directions at that link. (Last verified to work with v2.0.3)
 * (Optional) [AnimatedGIF](https://github.com/bitbank2/AnimatedGIF),
 for displaying animated GIF files. (Last verified to work with v1.4.7)
 * [Arduino IDE](https://www.arduino.cc/en/software) of course.
