@@ -93,6 +93,10 @@ by Emily Velasco
 ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/))
 6. `GFX_RotatedText` demonstrates support for Adafruit_GFX::setRotation()
 by rendering text in one of four orientations and one of three text sizes.
+7. `GFX_RotatedRect` demonstrates support for Adafruit_GFX::setRotation()
+by drawing four rectangles - one in each supported orientation - on every
+frame. Cycles through one of four animated pameters (X/Y/Width/Height)
+every second.
 
 ## Screen Size
 
