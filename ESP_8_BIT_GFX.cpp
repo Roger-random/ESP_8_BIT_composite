@@ -394,12 +394,12 @@ void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_
     return;
   }
 
-  // Account for screen rotation.
+  // Account for screen rotation. Copied from Adafruit_GFX.cpp then added width/height swap.
   int16_t t;
   switch (rotation) {
   case 1:
     t = x;
-    x = WIDTH - 1 - y - h;
+    x = WIDTH - 1 - y;
     y = t;
     // Swap width and height
     t = w;
@@ -407,13 +407,13 @@ void ESP_8_BIT_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_
     h = t;
     break;
   case 2:
-    x = WIDTH - 1 - x - w;
-    y = HEIGHT - 1 - y - h;
+    x = WIDTH - 1 - x;
+    y = HEIGHT - 1 - y;
     break;
   case 3:
     t = x;
     x = y;
-    y = HEIGHT - 1 - t - w;
+    y = HEIGHT - 1 - t;
     // Swap width and height
     t = w;
     w = h;
