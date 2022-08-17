@@ -164,6 +164,30 @@ color cylinder or a
 [RGB (red/green/blue)](https://en.wikipedia.org/wiki/RGB_color_space)
 color cube.
 
+## Alternatives
+
+The intent of this library is to be easy to use, with minimum complexity
+for beginners. Advanced users are expected to fork this repository to add
+their desired features, or go to the source and fork
+[ESP_8_BIT](https://github.com/rossumur/esp_8_bit) directly.
+
+If this library is not a good fit for your project, please consider another
+library for ESP32 composite video:
+* __[Bitluni's Lab](https://bitluni.net/esp32-composite-video)__: one of the
+earliest ESP32 composite video generators that informed development of many
+that followed.
+* __[FabGL](http://www.fabglib.org/)__:
+This powerful graphics library didn't have composite video output when I
+started my project, but it has since been added. See the
+[author's show-and-tell thread](https://github.com/fdivitto/FabGL/discussions/192)
+for details. The author has a Tektronix VM700 to ensure PAL video output
+signal is accurate.
+* __[LovyanGFX](https://github.com/lovyan03/LovyanGFX)__:
+Another graphics library that has recently
+[added composite video support](https://github.com/lovyan03/LovyanGFX/blob/develop/doc/Panel_CVBS.md).
+I believe this library is unique in support for NTSC-J, and documentation
+is in both Japanese and English. (Code comments are in Japanese.)
+
 ## Questions?
 
 Please [post to discussions](https://github.com/Roger-random/ESP_8_BIT_composite/discussions)
