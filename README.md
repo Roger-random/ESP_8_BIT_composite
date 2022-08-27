@@ -183,8 +183,8 @@ started my project, but it has since been added. See the
 for details. The author has a Tektronix VM700 to ensure PAL video output
 signal is accurate.
 * __[LovyanGFX](https://github.com/lovyan03/LovyanGFX)__:
-Another graphics library that has recently
-[added composite video support](https://github.com/lovyan03/LovyanGFX/blob/develop/doc/Panel_CVBS.md).
+Another very nice graphics library that has
+[preliminary composite video support in a development branch](https://github.com/lovyan03/LovyanGFX/blob/develop/doc/Panel_CVBS.md).
 I believe this library is unique in support for NTSC-J, and documentation
 is in both Japanese and English. (Code comments are in Japanese.)
 
