@@ -58,6 +58,8 @@ for displaying animated GIF files. (Last verified to work with v1.4.7)
 
 Here's an Arduino IDE screenshot of my ESP32 configuration:
 
+![Arduino IDE board/esp32/ESP32 Dev Module](https://github.com/Roger-random/ESP_8_BIT_composite/assets/8559196/18dc5615-d18b-4d3a-899a-90e478c65577)
+
 ![Screenshot 2023-12-03 142653](https://github.com/Roger-random/ESP_8_BIT_composite/assets/8559196/80512b60-5f2d-4ddc-8fdc-19cd63a1ad70)
 
 ## Not Compatible with "Arduino ESP32 Boards by Arduino"
