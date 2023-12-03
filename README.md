@@ -48,13 +48,13 @@ are untested and unknown.
 
 ## Arduino requirement
 * [Adafruit GFX Library](https://learn.adafruit.com/adafruit-gfx-graphics-library)
-available from Arduino IDE Library Manager. (Last verified to work with v1.11.2)
+available from Arduino IDE Library Manager. (Last verified to work with v1.11.9)
 * [Espressif Arduino Core for ESP32](https://github.com/espressif/arduino-esp32),
-follow installation directions at that link. (Last verified to work with v2.0.3)
+follow installation directions at that link. (Last verified to work with v2.0.14)
 * (Optional) [AnimatedGIF](https://github.com/bitbank2/AnimatedGIF),
 for displaying animated GIF files. (Last verified to work with v1.4.7)
 * [Arduino IDE](https://www.arduino.cc/en/software) of course.
-(Last verified to work with v1.8.19)
+(Last verified to work with v2.2.1)
 
 This library is __NOT compatible__ with the "Arduino ESP32 Boards by Arduino" board
 library. (thanks [JLBCS](https://github.com/JLBCS) for [#44](https://github.com/Roger-random/ESP_8_BIT_composite/issues/44))
@@ -65,9 +65,9 @@ ESP_8_BIT_composite.h:48:10: fatal error: driver/dac.h: No such file or director
           ^~~~~~~~~~~~~~
 ```
 
-My Arduino ESP32 configuration:
+Here's an Arduino IDE screenshot of my ESP32 configuration:
 
-![image](https://user-images.githubusercontent.com/8559196/156075869-3fb90cdf-711c-4dc0-8c94-f70d2e939b64.png)
+![Screenshot 2023-12-03 142653](https://github.com/Roger-random/ESP_8_BIT_composite/assets/8559196/80512b60-5f2d-4ddc-8fdc-19cd63a1ad70)
 
 ## Installation
 
