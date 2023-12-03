@@ -40,6 +40,12 @@ points:
 Chip identification obtained from [ESPTool](https://github.com/espressif/esptool)
 with the command `esptool chip_id`
 
+Pushing hardware limits in this manner may restrict this library to a subset of the
+ESP32 family. This library was developed and tested against the original suffix-free
+ESP32. Compatiblity with variants
+([ESP32-S2, ESP32-S3, etc.](https://en.wikipedia.org/wiki/ESP32#ESP32-xx_family))
+are untested and unknown.
+
 ## Arduino requirement
 * [Adafruit GFX Library](https://learn.adafruit.com/adafruit-gfx-graphics-library)
 available from Arduino IDE Library Manager. (Last verified to work with v1.11.2)
@@ -49,6 +55,15 @@ follow installation directions at that link. (Last verified to work with v2.0.3)
 for displaying animated GIF files. (Last verified to work with v1.4.7)
 * [Arduino IDE](https://www.arduino.cc/en/software) of course.
 (Last verified to work with v1.8.19)
+
+This library is __NOT compatible__ with the "Arduino ESP32 Boards by Arduino" board
+library. (thanks [JLBCS](https://github.com/JLBCS) for [#44](https://github.com/Roger-random/ESP_8_BIT_composite/issues/44))
+Compilation will fail with the following error:
+```
+ESP_8_BIT_composite.h:48:10: fatal error: driver/dac.h: No such file or directory
+ #include "driver/dac.h"
+          ^~~~~~~~~~~~~~
+```
 
 My Arduino ESP32 configuration:
 
