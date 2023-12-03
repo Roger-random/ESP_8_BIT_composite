@@ -56,6 +56,14 @@ for displaying animated GIF files. (Last verified to work with v1.4.7)
 * [Arduino IDE](https://www.arduino.cc/en/software) of course.
 (Last verified to work with v2.2.1)
 
+Here's an Arduino IDE screenshot of my ESP32 configuration:
+
+![Screenshot 2023-12-03 142653](https://github.com/Roger-random/ESP_8_BIT_composite/assets/8559196/80512b60-5f2d-4ddc-8fdc-19cd63a1ad70)
+
+## Not Compatible with "Arduino ESP32 Boards by Arduino"
+
+![arduino board manager esp32](https://github.com/Roger-random/ESP_8_BIT_composite/assets/8559196/01b60eb4-8d15-4aec-9f37-d9adfdf6e3f6)
+
 This library is __NOT compatible__ with the "Arduino ESP32 Boards by Arduino" board
 library. (thanks [JLBCS](https://github.com/JLBCS) for [#44](https://github.com/Roger-random/ESP_8_BIT_composite/issues/44))
 Compilation will fail with the following error:
@@ -65,9 +73,6 @@ ESP_8_BIT_composite.h:48:10: fatal error: driver/dac.h: No such file or director
           ^~~~~~~~~~~~~~
 ```
 
-Here's an Arduino IDE screenshot of my ESP32 configuration:
-
-![Screenshot 2023-12-03 142653](https://github.com/Roger-random/ESP_8_BIT_composite/assets/8559196/80512b60-5f2d-4ddc-8fdc-19cd63a1ad70)
 
 ## Installation
 
