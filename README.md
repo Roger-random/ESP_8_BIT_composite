@@ -1,14 +1,19 @@
 # ESP_8_BIT Color Composite Video Out Library
 
-## Status
+## Status: Currently __BROKEN__
 
-Currently __BROKEN__: Espressif recently updated their
-[ESP32 Arduino Core to version 3](https://github.com/espressif/arduino-esp32/releases/tag/3.0.0)
-which included breaking changes that cause compilation errors in
-this library. I am tracking the problem as
-[issue #50](https://github.com/Roger-random/ESP_8_BIT_composite/issues/50)
+Espressif made breaking changes to ESP32 Arduino Core between v2.x 
+and v3.x which cause compilation errors in this library.
+The first compiler error (but not the most serious one) is:
+
+`ESP_8_BIT_composite.cpp:45:55: error: invalid conversion from 'const volatile void*' to 'volatile void*' [-fpermissive]`
+
+I am tracking the problem as
+[issue #56](https://github.com/Roger-random/ESP_8_BIT_composite/issues/56)
 in this repository. Current workaround is to downgrade Espressif ESP32
 Arduino core to v2, this library was last verified to work with v2.0.14.
+
+![Espressif esp32 arduino core version select](https://github.com/user-attachments/assets/26cf3a2a-32a8-4f73-b9c7-db97d2b97441)
 
 ## Purpose
 
