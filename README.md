@@ -42,8 +42,10 @@ This composite video generation code is an extremely clever hack that used sever
 ESP32 peripherals in ways they were not originally designed for. See the
 [original author's blog documentation](https://rossumblog.com/2020/05/10/130/)
 for details. It also means older versions of ESP32 could not run this code.
-I don't know exactly which Espressif errata is relevant, but here are some data
-points:
+I don't know exactly which Espressif errata is relevant.
+[UPDATE: [sysytwl](https://github.com/Roger-random/ESP_8_BIT_composite/issues/55) believes it is [3.7 Audio PLL frequency range is limited.](https://www.espressif.com/sites/default/files/documentation/esp32_errata_en.pdf)]
+
+Here are some data points:
 
 * Known to work
   * `ESP32-D0WD (revision 1)` (mine)
