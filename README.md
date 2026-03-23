@@ -1,6 +1,23 @@
 # ESP_8_BIT Color Composite Video Out Library
 
-## Status: Currently __BROKEN__
+## Status: Abandoned
+
+Two years after Espressif made breaking changes in their ESP32 Arduino Core
+library from V2 to V3, I have accepted the reality that I will never be able
+to dedicate the time to upgrade this library for core V3.
+
+I have asked for this to be
+[removed from the Arduino Library Registry](https://github.com/arduino/library-registry/pull/7957)
+. I've been disappointing people for two years with a library stuck in the past.
+The least I can do is prevent future disappointments.
+
+This repository is MIT licensed and the invitation is open for anyone who wants
+to take up the challenge to maintain this library going forward. Once this name
+is released from the Arduino Library Registry (click link aabove to see current
+status of removal request) there should be nothing to stop them from re-registring
+under their own name.
+
+## Old information for historical reference
 
 Espressif made breaking changes to ESP32 Arduino Core between v2.x 
 and v3.x which cause compilation errors in this library.
